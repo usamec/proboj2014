@@ -81,9 +81,10 @@ class Msg:
     return 'inbox[%d]' % self.index
 
 class Area:
-  def __init__(self, r, c):
+  def __init__(self, type, r, c):
+    self.type = type
     self.r = r
     self.c = c
 
   def output(self):
-    return 'area[%d][%d]' % (self.r, self.c)
+    return '%s[%d][%d]' % (self.type, self.r, self.c)

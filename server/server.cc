@@ -60,16 +60,30 @@ Game LoadGame(char* fn) {
 };
 
 void Unit::Step() {
+  // TODO: inbox
+  // TODO: area
+  // TODO: Basic vars
+  data["X"] = x;
+  data["Y"] = y;
+  moved = false;
   RealStep();
 }
 
 void Unit::MOVE(int yy, int xx) {
+  if (moved) return;
+  moved = true;
   yy = max(-1, min(1, yy));
   xx = max(-1, min(1, xx));
+  int px = x;
+  int py = y;
   x += xx;
   y += yy;
   x = max(0, min((int)g->g[0].size()-1, x));
   y = max(0, min((int)g->g.size()-1, y));
+  if (g->g[y][x].wall == true) {
+    x = px;
+    y = py;
+  }
 }
 
 void LogMap(FILE *flog, Game &g) {
@@ -94,11 +108,16 @@ int main(int argc, char** argv) {
   fprintf(flog, ", \"steps\": [");
   int n_steps = 3;
   for (int st = 0; st < n_steps; st++) {
+    // TODO: randomize steps
+    // TODO: zucker
+    // TODO: scores
     printf("ss %d %d\n", g.units[st%g.units.size()]->y,
            g.units[st%g.units.size()]->x);
     g.units[st%g.units.size()]->Step();
     printf("ee %d %d\n", g.units[st%g.units.size()]->y,
            g.units[st%g.units.size()]->x);
+
+    // Logging
     fprintf(flog, "{\"units\": [");
     for (int i = 0; i < n_players; i++) {
       fprintf(flog, "[");

@@ -22,7 +22,7 @@ class ProbojScanner(runtime.Scanner):
         ('NUM', re.compile('-?[0-9]+')),
         ('CALL', re.compile('(PUT|MSG|MOVE)')),
         ('MSG', re.compile('INBOX')),
-        ('AREA', re.compile('AREA')),
+        ('AREA', re.compile('(AREA_PL|AREA_BASE|AREA_WALL|AREA_ZUCK)')),
         ('RAND', re.compile('RAND')),
         ('ID', re.compile('[a-zA-Z][a-zA-Z0-9_]*')),
         ('END', re.compile('$')),
@@ -139,7 +139,7 @@ class Proboj(runtime.Parser):
             self._scan('","', context=_context)
             NUM = self._scan('NUM', context=_context)
             self._scan('"\\\\]"', context=_context)
-            return Area(num1, int(NUM))
+            return Area(AREA, num1, int(NUM))
         else: # == 'RAND'
             RAND = self._scan('RAND', context=_context)
             return Rand()

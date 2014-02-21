@@ -1,7 +1,9 @@
 #ifndef MAP_H__
 #define MAP_H__
 
+#include <string>
 #include <vector>
+#include <unordered_map>
 using namespace std;
 
 struct Point {
@@ -18,10 +20,14 @@ class Unit {
  public:
   int x, y, id, player_id;
   Game *g;
+  bool moved;
 
   void Step();
   virtual void RealStep()=0;
   void MOVE(int yy, int xx);
+  unordered_map<string, int> data;
+  unordered_map<int, int> inbox;
+  unordered_map<int, unordered_map<int, int>> AREA_PL, AREA_BASE, AREA_WALL, AREA_ZUCK;
 };
 
 typedef vector<vector<Point>> Grid;
