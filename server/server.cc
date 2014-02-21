@@ -2,6 +2,7 @@
 #include "game_config.h"
 #include <cstdio>
 #include <algorithm>
+#include <unordered_map>
 
 void GetEmptyPos(Game &g, int team, int &y, int &x) {
   for (int i = 0; i < g.g.size(); i++) {
@@ -50,6 +51,7 @@ Game LoadGame(char* fn) {
       u->x = x;
       u->id = j;
       u->g = &g;
+      u->player_id = i;
       g.units.push_back(u);
     }
   }
@@ -70,15 +72,45 @@ void Unit::MOVE(int yy, int xx) {
   y = max(0, min((int)g->g.size()-1, y));
 }
 
+void LogMap(FILE *flog, Game &g) {
+  fprintf(flog, "\"map\":{\"r\": %d, \"c\": %d, \"data\":[", g.g.size(), g.g[0].size());
+  for (int i = 0; i < g.g.size(); i++) {
+    fprintf(flog, "[");
+    for (int j = 0; j < g.g[i].size(); j++) {
+      fprintf(flog, "%d%c", g.g[i][j].wall ? 1 : 0, j + 1 == g.g[i].size() ? ']' : ',');
+    }
+    fprintf(flog, "%c", i + 1 == g.g.size() ? ']' : ',');
+  }
+  fprintf(flog, "}");
+}
+
 int main(int argc, char** argv) {
   Game g = LoadGame(argv[1]);
+  FILE* flog = fopen(argv[2], "w");
+  fprintf(flog, "{");
+  LogMap(flog, g);
   printf("init done\n");
 
-  for (int i = 0; i < 1000; i++) {
-    printf("ss %d %d\n", g.units[i%g.units.size()]->y,
-           g.units[i%g.units.size()]->x);
-    g.units[i%g.units.size()]->Step();
-    printf("ee %d %d\n", g.units[i%g.units.size()]->y,
-           g.units[i%g.units.size()]->x);
+  fprintf(flog, ", \"steps\": [");
+  int n_steps = 3;
+  for (int st = 0; st < n_steps; st++) {
+    printf("ss %d %d\n", g.units[st%g.units.size()]->y,
+           g.units[st%g.units.size()]->x);
+    g.units[st%g.units.size()]->Step();
+    printf("ee %d %d\n", g.units[st%g.units.size()]->y,
+           g.units[st%g.units.size()]->x);
+    fprintf(flog, "{\"units\": [");
+    for (int i = 0; i < n_players; i++) {
+      fprintf(flog, "[");
+      for (int j = 0; j < g.units_per_team; j++) {
+        fprintf(flog, "{\"y\": %d, \"x\": %d}%c", g.units[i*g.units_per_team+j]->y,
+                g.units[i*g.units_per_team+j]->x, j + 1 == g.units_per_team ? ']' : ',');
+      }
+      fprintf(flog, "%c", i + 1 == n_players ? ']' : ',');
+    }
+    fprintf(flog, "}%c", st + 1 == n_steps ? ']' : ','); 
   }
+  fprintf(flog, "}");
+
+  fclose(flog);
 }

@@ -16,7 +16,7 @@ struct Game;
 
 class Unit {
  public:
-  int x, y, id;
+  int x, y, id, player_id;
   Game *g;
 
   void Step();
