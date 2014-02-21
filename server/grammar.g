@@ -2,10 +2,11 @@ from compiler_objs import *
 %%
 parser Proboj:
     ignore:      '\\s+'
-    token NUM:   '[0-9]+'
-    token CALL:  "(RAND|PUT|MSG)"
+    token NUM:   '-?[0-9]+'
+    token CALL:  "(PUT|MSG|MOVE)"
     token MSG:   "INBOX"
     token AREA:  "AREA"
+    token RAND:  "RAND"
     token ID:    '[a-zA-Z][a-zA-Z0-9_]*' 
     token END:   "$"
  
@@ -40,5 +41,6 @@ parser Proboj:
                 "[(]"expr0"[)]" {{ return expr0 }} |
                 ID {{ return Id(ID) }} |
                 MSG"\\["NUM"\\]" {{ return Msg(int(NUM)) }} | 
-                AREA"\\["NUM {{ num1 = int(NUM) }} ","NUM"\\]" {{ return Area(num1, int(NUM)) }}
+                AREA"\\["NUM {{ num1 = int(NUM) }} ","NUM"\\]" {{ return Area(num1, int(NUM)) }} | 
+                RAND {{ return Rand() }}
                 
