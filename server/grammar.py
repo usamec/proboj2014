@@ -19,10 +19,11 @@ class ProbojScanner(runtime.Scanner):
         ('"="', re.compile('=')),
         ('";"', re.compile(';')),
         ('\\s+', re.compile('\\s+')),
-        ('NUM', re.compile('[0-9]+')),
-        ('CALL', re.compile('(RAND|PUT|MSG)')),
+        ('NUM', re.compile('-?[0-9]+')),
+        ('CALL', re.compile('(PUT|MSG|MOVE)')),
         ('MSG', re.compile('INBOX')),
         ('AREA', re.compile('AREA')),
+        ('RAND', re.compile('RAND')),
         ('ID', re.compile('[a-zA-Z][a-zA-Z0-9_]*')),
         ('END', re.compile('$')),
     ]
@@ -64,7 +65,7 @@ class Proboj(runtime.Parser):
         CALL = self._scan('CALL', context=_context)
         self._scan('"[(]"', context=_context)
         e = Call(CALL)
-        if self._peek('"[)]"', '","', 'NUM', '"[(]"', 'ID', 'MSG', 'AREA', context=_context) not in ['"[)]"', '","']:
+        if self._peek('"[)]"', '","', 'NUM', '"[(]"', 'ID', 'MSG', 'AREA', 'RAND', context=_context) not in ['"[)]"', '","']:
             expr0 = self.expr0(_context)
             e.add_arg(expr0)
             while self._peek('","', '"[)]"', context=_context) == '","':
@@ -112,7 +113,7 @@ class Proboj(runtime.Parser):
 
     def expr2(self, _parent=None):
         _context = self.Context(_parent, self._scanner, 'expr2', [])
-        _token = self._peek('NUM', '"[(]"', 'ID', 'MSG', 'AREA', context=_context)
+        _token = self._peek('NUM', '"[(]"', 'ID', 'MSG', 'AREA', 'RAND', context=_context)
         if _token == 'NUM':
             NUM = self._scan('NUM', context=_context)
             return Num(int(NUM))
@@ -130,7 +131,7 @@ class Proboj(runtime.Parser):
             NUM = self._scan('NUM', context=_context)
             self._scan('"\\\\]"', context=_context)
             return Msg(int(NUM))
-        else: # == 'AREA'
+        elif _token == 'AREA':
             AREA = self._scan('AREA', context=_context)
             self._scan('"\\\\["', context=_context)
             NUM = self._scan('NUM', context=_context)
@@ -139,6 +140,9 @@ class Proboj(runtime.Parser):
             NUM = self._scan('NUM', context=_context)
             self._scan('"\\\\]"', context=_context)
             return Area(num1, int(NUM))
+        else: # == 'RAND'
+            RAND = self._scan('RAND', context=_context)
+            return Rand()
 
 
 def parse(rule, text):

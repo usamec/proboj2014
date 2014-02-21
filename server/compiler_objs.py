@@ -43,12 +43,26 @@ class Call:
   def add_arg(self, arg):
     self.args.append(arg)
 
+  def output(self, indent):
+    ret_parts = []
+    ret_parts.append(" "*indent)
+    ret_parts.append(self.what)
+    ret_parts.append("(")
+    args_str = [x.output() for x in self.args]
+    ret_parts.append(",".join(args_str))
+    ret_parts.append(");")
+    return ''.join(ret_parts)
+
 class Num:
   def __init__(self, what):
     self.what = what
 
   def output(self):
     return str(self.what)
+
+class Rand:
+  def output(self):
+    return "rand()"
 
 class Id:
   def __init__(self, what):
@@ -57,13 +71,19 @@ class Id:
   def output(self):
     if self.what in keywords:
       raise Exception("Pouzil is keyword ako premennu")
-    return self.what
+    return 'data["%s"]' % self.what
 
 class Msg:
   def __init__(self, index):
     self.index = index
 
+  def output(self):
+    return 'inbox[%d]' % self.index
+
 class Area:
   def __init__(self, r, c):
     self.r = r
     self.c = c
+
+  def output(self):
+    return 'area[%d][%d]' % (self.r, self.c)
