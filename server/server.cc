@@ -1,6 +1,7 @@
 #include "map.h"
 #include "game_config.h"
 #include <cstdio>
+#include <algorithm>
 
 void GetEmptyPos(Game &g, int team, int &y, int &x) {
   for (int i = 0; i < g.g.size(); i++) {
@@ -47,6 +48,8 @@ Game LoadGame(char* fn) {
       Unit* u = CreatePlayerUnit(i);
       u->y = y;
       u->x = x;
+      u->id = j;
+      u->g = &g;
       g.units.push_back(u);
     }
   }
@@ -54,7 +57,28 @@ Game LoadGame(char* fn) {
   return g;
 };
 
+void Unit::Step() {
+  RealStep();
+}
+
+void Unit::MOVE(int yy, int xx) {
+  yy = max(-1, min(1, yy));
+  xx = max(-1, min(1, xx));
+  x += xx;
+  y += yy;
+  x = max(0, min((int)g->g[0].size()-1, x));
+  y = max(0, min((int)g->g.size()-1, y));
+}
+
 int main(int argc, char** argv) {
   Game g = LoadGame(argv[1]);
   printf("init done\n");
+
+  for (int i = 0; i < 1000; i++) {
+    printf("ss %d %d\n", g.units[i%g.units.size()]->y,
+           g.units[i%g.units.size()]->x);
+    g.units[i%g.units.size()]->Step();
+    printf("ee %d %d\n", g.units[i%g.units.size()]->y,
+           g.units[i%g.units.size()]->x);
+  }
 }

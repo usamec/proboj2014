@@ -12,9 +12,16 @@ struct Point {
   Point() : wall(false), zucker(0), zucker_prob(0.0), base(-1) {}
 };
 
+struct Game;
+
 class Unit {
  public:
-  int x, y;
+  int x, y, id;
+  Game *g;
+
+  void Step();
+  virtual void RealStep()=0;
+  void MOVE(int yy, int xx);
 };
 
 typedef vector<vector<Point>> Grid;
