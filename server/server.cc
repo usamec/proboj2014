@@ -60,6 +60,8 @@ Game LoadGame(char* fn) {
 };
 
 void Unit::Step() {
+  // TODO: inbox
+  // TODO: area
   RealStep();
 }
 
@@ -99,6 +101,8 @@ int main(int argc, char** argv) {
     g.units[st%g.units.size()]->Step();
     printf("ee %d %d\n", g.units[st%g.units.size()]->y,
            g.units[st%g.units.size()]->x);
+
+    // Logging
     fprintf(flog, "{\"units\": [");
     for (int i = 0; i < n_players; i++) {
       fprintf(flog, "[");
