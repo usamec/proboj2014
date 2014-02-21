@@ -5,7 +5,7 @@ parser Proboj:
     token NUM:   '-?[0-9]+'
     token CALL:  "(PUT|MSG|MOVE)"
     token MSG:   "INBOX"
-    token AREA:  "AREA"
+    token AREA:  "(AREA_PL|AREA_BASE|AREA_WALL|AREA_ZUCK)"
     token RAND:  "RAND"
     token ID:    '[a-zA-Z][a-zA-Z0-9_]*' 
     token END:   "$"
@@ -41,6 +41,6 @@ parser Proboj:
                 "[(]"expr0"[)]" {{ return expr0 }} |
                 ID {{ return Id(ID) }} |
                 MSG"\\["NUM"\\]" {{ return Msg(int(NUM)) }} | 
-                AREA"\\["NUM {{ num1 = int(NUM) }} ","NUM"\\]" {{ return Area(num1, int(NUM)) }} | 
+                AREA"\\["NUM {{ num1 = int(NUM) }} ","NUM"\\]" {{ return Area(AREA, num1, int(NUM)) }} | 
                 RAND {{ return Rand() }}
                 
