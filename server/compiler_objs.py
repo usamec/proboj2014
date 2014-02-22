@@ -1,5 +1,50 @@
 keywords = ["RAND", "PUT", "MSG", "AREA"]
 
+class Cond:
+  def __init__(self, if_expr, if_block):
+    self.if_expr = if_expr
+    self.if_block = if_block
+    self.elifs = []
+    self.else_block = None
+
+  def add_elif(self, expr, block):
+    self.elifs.append((expr, block))
+
+  def add_else(self, block):
+    self.else_block = block
+
+  def output(self, indent):
+    ret_parts = []
+    ret_parts.append(" "*indent)
+    ret_parts.append("if (")
+    ret_parts.append(self.if_expr.output())
+    ret_parts.append(") {\n")
+    for x in self.if_block:
+      ret_parts.append(x.output(indent+2))
+      ret_parts.append("\n");
+    ret_parts.append(" "*indent)
+    ret_parts.append("}")
+    for el in self.elifs:
+      ret_parts.append(" else if (")
+      ret_parts.append(el[0].output())
+      ret_parts.append(") {\n")
+      for x in el[1]:
+        ret_parts.append(x.output(indent+2))
+        ret_parts.append("\n");
+      ret_parts.append(" "*indent)
+      ret_parts.append("}")
+    
+    if self.else_block:
+      ret_parts.append(" else {\n")
+      for x in self.else_block:
+        ret_parts.append(x.output(indent+2))
+        ret_parts.append("\n");
+      ret_parts.append(" "*indent)
+      ret_parts.append("}")
+      
+
+    return ''.join(ret_parts)
+
 class Expr:
   def __init__(self, left):
     self.left = left

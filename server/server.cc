@@ -40,6 +40,7 @@ Game LoadGame(char* fn) {
         g.g[i][j].base = (int)(x-1);
       }
       else g.g[i][j].zucker_prob = x;
+      g.g[i][j].marks.resize(n_players);
     }
   }
   for (int i = 0; i < n_players; i++) {
@@ -49,9 +50,9 @@ Game LoadGame(char* fn) {
       Unit* u = CreatePlayerUnit(i);
       u->y = y;
       u->x = x;
-      u->id = j;
+      u->id = j+1;
       u->g = &g;
-      u->player_id = i;
+      u->player_id = i+1;
       g.units.push_back(u);
     }
   }
@@ -61,11 +62,44 @@ Game LoadGame(char* fn) {
 
 void Unit::Step() {
   // TODO: inbox
-  // TODO: area
-  // TODO: Basic vars
   data["X"] = x;
   data["Y"] = y;
+  data["PL_ID"] = player_id;
+  data["ID"] = id;
+  data["MAX_ID"] = g->units_per_team;
+  data["CARRY"] = carry;
   moved = false;
+  putted = false;
+  grabbed = false;
+  written = false;
+  AREA_PL.clear();
+  AREA_BASE.clear();
+  AREA_WALL.clear();
+  AREA_ZUCK.clear();
+  AREA_MARKS.clear();
+  int sur = 2;
+  for (int i = -sur; i <= sur; i++) {
+    for (int j = -sur; j <= sur; j++) {
+      if (abs(i) + abs(j) > sur) continue;
+      int ry = y - i;
+      int rx = x - j;
+      if (ry < 0 || rx < 0 || ry >= g->g.size() || rx >= g->g[0].size()) continue;
+      AREA_PL[i][j] = 0;
+      for (int k = 0; k < g->units.size(); k++) {
+        if (g->units[k]->x == rx && g->units[k]->y == ry) {
+          if (g->units[k]->player_id != player_id) 
+            AREA_PL[i][j] = g->units[k]->player_id; 
+          else
+            AREA_PL[i][j] = -g->units[k]->id;
+        }
+      }
+
+      AREA_BASE[i][j] = g->g[ry][rx].base+1;
+      AREA_WALL[i][j] = g->g[ry][rx].wall;
+      AREA_ZUCK[i][j] = g->g[ry][rx].zucker;
+      AREA_MARKS[i][j] = g->g[ry][rx].marks[player_id-1];
+    }
+  }
   RealStep();
 }
 
@@ -80,9 +114,34 @@ void Unit::MOVE(int yy, int xx) {
   y += yy;
   x = max(0, min((int)g->g[0].size()-1, x));
   y = max(0, min((int)g->g.size()-1, y));
+  // TODO: check other units
   if (g->g[y][x].wall == true) {
     x = px;
     y = py;
+  }
+}
+
+void Unit::WRITE(int num) {
+  if (written) return;
+  written = true;
+  g->g[y][x].marks[player_id-1] = num;
+}
+
+void Unit::GRAB() {
+  if (grabbed) return;
+  grabbed = true;
+  if (g->g[y][x].zucker > 0) {
+    g->g[y][x].zucker-=1;
+  }
+  carry += 1;
+}
+
+void Unit::PUT() {
+  if (putted) return;
+  putted = true;
+  if (g->g[y][x].base == player_id - 1) {
+    // TODO: score
+    carry = 0;
   }
 }
 
@@ -106,10 +165,19 @@ int main(int argc, char** argv) {
   printf("init done\n");
 
   fprintf(flog, ", \"steps\": [");
-  int n_steps = 3;
+  int n_steps = 20;
+  int n_zucker = 10;
   for (int st = 0; st < n_steps; st++) {
     // TODO: randomize steps
-    // TODO: zucker
+    for (int z = 0; z < n_zucker; z++) {
+      int y = rand()%g.g.size();
+      int x = rand()%g.g[0].size();
+      if (rand()%100000 < ((int)(100000*g.g[y][x].zucker_prob))) {
+        g.g[y][x].zucker += 1;
+        g.g[y][x].zucker = min(10, g.g[y][x].zucker);
+        printf("zucker %d %d %d\n", y, x, g.g[y][x].zucker);
+      }
+    }
     // TODO: scores
     printf("ss %d %d\n", g.units[st%g.units.size()]->y,
            g.units[st%g.units.size()]->x);
