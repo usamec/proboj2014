@@ -13,16 +13,26 @@ class ProbojScanner(runtime.Scanner):
         ('"[*]"', re.compile('[*]')),
         ('"-"', re.compile('-')),
         ('"[+]"', re.compile('[+]')),
-        ('"[)]"', re.compile('[)]')),
+        ('">="', re.compile('>=')),
+        ('">"', re.compile('>')),
+        ('"<"', re.compile('<')),
+        ('"<="', re.compile('<=')),
+        ('"=="', re.compile('==')),
         ('","', re.compile(',')),
-        ('"[(]"', re.compile('[(]')),
         ('"="', re.compile('=')),
+        ('"}"', re.compile('}')),
+        ('"{"', re.compile('{')),
+        ('"[)]"', re.compile('[)]')),
+        ('"[(]"', re.compile('[(]')),
         ('";"', re.compile(';')),
         ('\\s+', re.compile('\\s+')),
         ('NUM', re.compile('-?[0-9]+')),
-        ('CALL', re.compile('(PUT|MSG|MOVE)')),
+        ('ELIF', re.compile('elif')),
+        ('IF', re.compile('if')),
+        ('ELSE', re.compile('else')),
+        ('CALL', re.compile('(PUT|MSG|MOVE|GRAB|WRITE)')),
         ('MSG', re.compile('INBOX')),
-        ('AREA', re.compile('(AREA_PL|AREA_BASE|AREA_WALL|AREA_ZUCK)')),
+        ('AREA', re.compile('(AREA_PL|AREA_BASE|AREA_WALL|AREA_ZUCK|AREA_MARKS)')),
         ('RAND', re.compile('RAND')),
         ('ID', re.compile('[a-zA-Z][a-zA-Z0-9_]*')),
         ('END', re.compile('$')),
@@ -35,7 +45,7 @@ class Proboj(runtime.Parser):
     def goal(self, _parent=None):
         _context = self.Context(_parent, self._scanner, 'goal', [])
         g = []
-        while self._peek('END', 'ID', 'CALL', context=_context) != 'END':
+        while self._peek('END', 'ID', 'CALL', 'IF', context=_context) != 'END':
             statement = self.statement(_context)
             g.append(statement)
         END = self._scan('END', context=_context)
@@ -43,22 +53,56 @@ class Proboj(runtime.Parser):
 
     def statement(self, _parent=None):
         _context = self.Context(_parent, self._scanner, 'statement', [])
-        _token = self._peek('ID', 'CALL', context=_context)
+        _token = self._peek('ID', 'CALL', 'IF', context=_context)
         if _token == 'ID':
             assignment = self.assignment(_context)
             self._scan('";"', context=_context)
             return assignment
-        else: # == 'CALL'
+        elif _token == 'CALL':
             call = self.call(_context)
             self._scan('";"', context=_context)
             return call
+        else: # == 'IF'
+            conditional = self.conditional(_context)
+            return conditional
+
+    def conditional(self, _parent=None):
+        _context = self.Context(_parent, self._scanner, 'conditional', [])
+        IF = self._scan('IF', context=_context)
+        self._scan('"[(]"', context=_context)
+        exprcomp = self.exprcomp(_context)
+        self._scan('"[)]"', context=_context)
+        block = self.block(_context)
+        i = Cond(exprcomp, block)
+        while self._peek('ELIF', 'ELSE', 'END', '"}"', 'ID', 'CALL', 'IF', context=_context) == 'ELIF':
+            ELIF = self._scan('ELIF', context=_context)
+            self._scan('"[(]"', context=_context)
+            exprcomp = self.exprcomp(_context)
+            self._scan('"[)]"', context=_context)
+            block = self.block(_context)
+        i.add_elif(exprcomp, block)
+        if self._peek('ELSE', 'ELIF', 'END', '"}"', 'ID', 'CALL', 'IF', context=_context) == 'ELSE':
+            ELSE = self._scan('ELSE', context=_context)
+            block = self.block(_context)
+        i.add_else(block)
+        return i
+
+    def block(self, _parent=None):
+        _context = self.Context(_parent, self._scanner, 'block', [])
+        self._scan('"{"', context=_context)
+        g = []
+        while self._peek('"}"', 'ID', 'CALL', 'IF', context=_context) != '"}"':
+            statement = self.statement(_context)
+            g.append(statement)
+        self._scan('"}"', context=_context)
+        return g
 
     def assignment(self, _parent=None):
         _context = self.Context(_parent, self._scanner, 'assignment', [])
         ID = self._scan('ID', context=_context)
         self._scan('"="', context=_context)
-        expr0 = self.expr0(_context)
-        return Assignment(Id(ID), expr0)
+        exprcomp = self.exprcomp(_context)
+        return Assignment(Id(ID), exprcomp)
 
     def call(self, _parent=None):
         _context = self.Context(_parent, self._scanner, 'call', [])
@@ -66,20 +110,48 @@ class Proboj(runtime.Parser):
         self._scan('"[(]"', context=_context)
         e = Call(CALL)
         if self._peek('"[)]"', '","', 'NUM', '"[(]"', 'ID', 'MSG', 'AREA', 'RAND', context=_context) not in ['"[)]"', '","']:
-            expr0 = self.expr0(_context)
-            e.add_arg(expr0)
+            exprcomp = self.exprcomp(_context)
+            e.add_arg(exprcomp)
             while self._peek('","', '"[)]"', context=_context) == '","':
                 self._scan('","', context=_context)
-                expr0 = self.expr0(_context)
-                e.add_arg(expr0)
+                exprcomp = self.exprcomp(_context)
+                e.add_arg(exprcomp)
         self._scan('"[)]"', context=_context)
+        return e
+
+    def exprcomp(self, _parent=None):
+        _context = self.Context(_parent, self._scanner, 'exprcomp', [])
+        expr0 = self.expr0(_context)
+        e = Expr(expr0)
+        while self._peek('"=="', '"<="', '"<"', '">"', '">="', '"[)]"', '","', '";"', context=_context) not in ['"[)]"', '","', '";"']:
+            _token = self._peek('"=="', '"<="', '"<"', '">"', '">="', context=_context)
+            if _token == '"=="':
+                self._scan('"=="', context=_context)
+                expr0 = self.expr0(_context)
+                e.add_op("==", expr0)
+            elif _token == '"<="':
+                self._scan('"<="', context=_context)
+                expr0 = self.expr0(_context)
+                e.add_op("<", expr0)
+            elif _token == '"<"':
+                self._scan('"<"', context=_context)
+                expr0 = self.expr0(_context)
+                e.add_op("<", expr0)
+            elif _token == '">"':
+                self._scan('">"', context=_context)
+                expr0 = self.expr0(_context)
+                e.add_op("<", expr0)
+            else: # == '">="'
+                self._scan('">="', context=_context)
+                expr0 = self.expr0(_context)
+                e.add_op("<", expr0)
         return e
 
     def expr0(self, _parent=None):
         _context = self.Context(_parent, self._scanner, 'expr0', [])
         expr1 = self.expr1(_context)
         e = Expr(expr1)
-        while self._peek('"[+]"', '"-"', '"[)]"', '","', '";"', context=_context) in ['"[+]"', '"-"']:
+        while self._peek('"[+]"', '"-"', '"[)]"', '"=="', '"<="', '"<"', '">"', '">="', '","', '";"', context=_context) in ['"[+]"', '"-"']:
             _token = self._peek('"[+]"', '"-"', context=_context)
             if _token == '"[+]"':
                 self._scan('"[+]"', context=_context)
@@ -95,7 +167,7 @@ class Proboj(runtime.Parser):
         _context = self.Context(_parent, self._scanner, 'expr1', [])
         expr2 = self.expr2(_context)
         e = Expr(expr2)
-        while self._peek('"[*]"', '"/"', '"%"', '"[+]"', '"-"', '"[)]"', '","', '";"', context=_context) in ['"[*]"', '"/"', '"%"']:
+        while self._peek('"[*]"', '"/"', '"%"', '"[+]"', '"-"', '"[)]"', '"=="', '"<="', '"<"', '">"', '">="', '","', '";"', context=_context) in ['"[*]"', '"/"', '"%"']:
             _token = self._peek('"[*]"', '"/"', '"%"', context=_context)
             if _token == '"[*]"':
                 self._scan('"[*]"', context=_context)

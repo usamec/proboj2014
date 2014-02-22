@@ -3,9 +3,12 @@ from compiler_objs import *
 parser Proboj:
     ignore:      '\\s+'
     token NUM:   '-?[0-9]+'
-    token CALL:  "(PUT|MSG|MOVE)"
+    token ELIF:  "elif"
+    token IF:    "if"
+    token ELSE:  "else"
+    token CALL:  "(PUT|MSG|MOVE|GRAB|WRITE)"
     token MSG:   "INBOX"
-    token AREA:  "(AREA_PL|AREA_BASE|AREA_WALL|AREA_ZUCK)"
+    token AREA:  "(AREA_PL|AREA_BASE|AREA_WALL|AREA_ZUCK|AREA_MARKS)"
     token RAND:  "RAND"
     token ID:    '[a-zA-Z][a-zA-Z0-9_]*' 
     token END:   "$"
@@ -18,12 +21,31 @@ parser Proboj:
 
     rule statement: assignment";" {{ return assignment }}
                     | call";" {{ return call }}
-    rule assignment: ID "=" expr0 {{ return Assignment(Id(ID), expr0) }}
+                    | conditional {{ return conditional }}
+
+    rule conditional: IF"[(]" exprcomp "[)]" block {{ i = Cond(exprcomp, block) }}
+                      (ELIF"[(]" exprcomp "[)]" block)* {{ i.add_elif(exprcomp, block) }}
+                      (ELSE block)? {{i.add_else(block) }}
+                      {{ return i }}
+
+    rule block: "{" {{ g = [] }} (statement {{ g.append(statement) }})*
+                "}" {{ return g }}
+
+    rule assignment: ID "=" exprcomp {{ return Assignment(Id(ID), exprcomp) }}
     rule call: CALL"[(]"  {{ e = Call(CALL) }}
-                   (expr0 {{ e.add_arg(expr0) }}
-                   (","expr0  {{ e.add_arg(expr0) }}
+                   (exprcomp {{ e.add_arg(exprcomp) }}
+                   (","exprcomp  {{ e.add_arg(exprcomp) }}
                    )*)?
                    "[)]"   {{ return e }}
+
+    rule exprcomp: expr0 {{ e = Expr(expr0) }}
+                   ( "==" expr0  {{ e.add_op("==", expr0) }}
+                   | "<=" expr0  {{ e.add_op("<", expr0) }}
+                   | "<" expr0  {{ e.add_op("<", expr0) }}
+                   | ">" expr0  {{ e.add_op("<", expr0) }}
+                   | ">=" expr0  {{ e.add_op("<", expr0) }}
+                   )*  {{ return e }}
+
 
     rule expr0: expr1          {{ e = Expr(expr1) }}
                 ( "[+]" expr1  {{ e.add_op("+", expr1) }}
