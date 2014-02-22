@@ -22,6 +22,11 @@ mapa = []
 steps = []
 cukor = []
 state = 0
+dejeSa = []
+velkost = 0
+stav = "running"
+
+
 
 def main():
     global FPSCLOCK, DISPLAYSURF, BASICFONT
@@ -60,7 +65,7 @@ def getInput():
 
 def runGame():
     global FPSCLOCK, DISPLAYSURF, BASICFONT
-    global mapa, steps, cukor
+    global mapa, steps, cukor, stav
     
     
     print "Game is running"
@@ -83,15 +88,24 @@ def runGame():
                     print "lol"
                     wanaHelp = not wanaHelp
                 
+                elif event.key == K_s:
+                    if stav == "running":
+                        stav = "paused"
+                    else:
+                        stav = "running"
+
                 elif event.key == K_ESCAPE:
                     terminate()
 
         
         DISPLAYSURF.fill(BGCOLOR)
+        if stav == "running":
+            gameUpdate()
         
         drawMap()
+        drawPlayers()
         
-        gameUpdate()
+        
         
         if wanaHelp :
             drawHelp()
@@ -102,30 +116,49 @@ def runGame():
         
         FPSCLOCK.tick(FPS)
 
-        
+
 def gameUpdate():
-    global mapa, steps, cukor, state
+    global mapa, steps, cukor, state, dejeSa
     
     dejeSa = steps[state]   
     state= state+1
-    
+    if state > len(steps):
+        state= "end"
+        return
+        
     for c in dejeSa['zucker']:
         cukor[c['y']][c['x']] = c['new_ammount']
+    
+    pprint.pprint(dejeSa)
+    pprint.pprint(cukor)
 
+def iWanaRect(x, y, size):
+    global mapa, velkost
+    
+    iHaveX, iHavey = 300, 300
+    velkost = (min(iHaveX / mapa['c'] , iHavey / mapa['r']))
+    
+    
+    marginTop, marginLeft = 20, 20
+    
+    return pygame.Rect(marginLeft + x*velkost - size, marginTop + y*velkost - size, velkost + size, velkost + size)
+            
 
 def drawMap():
-    global mapa, steps, cukor
-    
-    iHaveX, iHavey = 600, 600
-    velkost = computeSize()
-    velkost = 20
-    
-    marginTop, marginLeft = 10, 10
-    
+    global mapa, steps, cukor, velkost
+        
     for i in range(mapa['r']):
         for j in range(mapa['c']):
-            policko = pygame.Rect(marginLeft + j*velkost, marginTop + i*velkost, marginLeft + (j+1)*velkost, marginTop + (i+1)*velkost)
+            policko = iWanaRect(j,i,0)
             pygame.draw.rect(DISPLAYSURF, getColor(mapa['data'][i][j],cukor[i][j]) , policko)
+
+def drawPlayers():
+    global dejeSa
+    
+    for i, player in enumerate (dejeSa['units']):
+        for minion in player:
+            character = iWanaRect(minion['x'],minion['y'],2)
+            pygame.draw.rect(DISPLAYSURF, (100*i,150, 150) , character)
 
 
 def getColor(coJe, cukor):
@@ -135,14 +168,10 @@ def getColor(coJe, cukor):
         return (cukor*20, 200+ cukor*5, cukor*20)
 
 
-def computeSize():
-    return 0
-    
-
 def drawHelp():
-    helpSurf = BASICFONT.render('Score: %s', True, BLACK) #funky options
+    helpSurf = BASICFONT.render('s- stop, Esc - koniec, ', True, BLACK) #funky options
     helpRect = helpSurf.get_rect()
-    helpRect.topleft = (WINDOWWIDTH - 120, 10)
+    helpRect.topleft = (WINDOWWIDTH - 200, 10)
     DISPLAYSURF.blit(helpSurf, helpRect)
     
 def terminate():
