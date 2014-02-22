@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <unordered_map>
 
+vector<int> scores;
+
 void GetEmptyPos(Game &g, int team, int &y, int &x) {
   for (int i = 0; i < g.g.size(); i++) {
     for (int j = 0; j < g.g[i].size(); j++) {
@@ -29,6 +31,7 @@ Game LoadGame(char* fn) {
   FILE *f = fopen(fn, "r");
   Game g;
   int r, c;
+  scores.resize(n_players);
   fscanf(f, "%d %d %d", &r, &c, &g.units_per_team);
   g.g.resize(r, vector<Point>(c));
   for (int i = 0; i < r; i++) {
@@ -140,7 +143,7 @@ void Unit::PUT() {
   if (putted) return;
   putted = true;
   if (g->g[y][x].base == player_id - 1) {
-    // TODO: score
+    scores[player_id-1] += carry;
     carry = 0;
   }
 }
@@ -168,14 +171,17 @@ int main(int argc, char** argv) {
   int n_steps = 20;
   int n_zucker = 10;
   for (int st = 0; st < n_steps; st++) {
+    vector<pair<int, int>> zucker_change;
     // TODO: randomize steps
     for (int z = 0; z < n_zucker; z++) {
       int y = rand()%g.g.size();
       int x = rand()%g.g[0].size();
       if (rand()%100000 < ((int)(100000*g.g[y][x].zucker_prob))) {
-        g.g[y][x].zucker += 1;
-        g.g[y][x].zucker = min(10, g.g[y][x].zucker);
-        printf("zucker %d %d %d\n", y, x, g.g[y][x].zucker);
+        if (g.g[y][x].zucker < 10) {
+          g.g[y][x].zucker += 1;
+          printf("zucker %d %d %d\n", y, x, g.g[y][x].zucker);
+          zucker_change.push_back(make_pair(y, x));
+        }
       }
     }
     // TODO: scores
@@ -190,10 +196,25 @@ int main(int argc, char** argv) {
     for (int i = 0; i < n_players; i++) {
       fprintf(flog, "[");
       for (int j = 0; j < g.units_per_team; j++) {
-        fprintf(flog, "{\"y\": %d, \"x\": %d}%c", g.units[i*g.units_per_team+j]->y,
-                g.units[i*g.units_per_team+j]->x, j + 1 == g.units_per_team ? ']' : ',');
+        fprintf(flog, "{\"y\": %d, \"x\": %d, \"carry\": %d }%c",
+                g.units[i*g.units_per_team+j]->y,
+                g.units[i*g.units_per_team+j]->x, 
+                g.units[i*g.units_per_team+j]->carry,
+                j + 1 == g.units_per_team ? ']' : ',');
       }
       fprintf(flog, "%c", i + 1 == n_players ? ']' : ',');
+    }
+    fprintf(flog, ", \"zucker\": [");
+    for (int i = 0; i < zucker_change.size(); i++) {
+      fprintf(flog, "{\"y\": %d, \"x\": %d, \"new_ammount\": %d}",
+              zucker_change[i].first, zucker_change[i].second,
+              g.g[zucker_change[i].first][zucker_change[i].second].zucker);
+      if (i + 1 < zucker_change.size()) fprintf(flog, ",");
+    }
+    fprintf(flog, "]");
+    fprintf(flog, ", \"scores\": [");
+    for (int i = 0; i < scores.size(); i++) {
+      fprintf(flog, "%d%c", scores[i], i + 1 == scores.size() ? ']' : ',');
     }
     fprintf(flog, "}%c", st + 1 == n_steps ? ']' : ','); 
   }
