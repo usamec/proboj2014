@@ -132,7 +132,7 @@ def getColor(coJe, cukor):
     if coJe != 0:
         return BLACK
     else: 
-        return (cukor*20, 200+ cukor*5, cukor*20)
+        return (cukor*20, 200-cukor*10, cukor*20)
 
 
 def computeSize():
