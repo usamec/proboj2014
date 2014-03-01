@@ -6,7 +6,8 @@ parser Proboj:
     token ELIF:  "elif"
     token IF:    "if"
     token ELSE:  "else"
-    token CALL:  "(PUT|MSG|MOVE|GRAB|WRITE)"
+    token CALL:  "(PUT|MOVE|GRAB|WRITE|ATTACK)"
+    token MSGCALL: "MSG"
     token MSG:   "INBOX"
     token AREA:  "(AREA_PL|AREA_BASE|AREA_WALL|AREA_ZUCK|AREA_MARKS)"
     token RAND:  "RAND"
@@ -21,7 +22,13 @@ parser Proboj:
 
     rule statement: assignment";" {{ return assignment }}
                     | call";" {{ return call }}
+                    | msgcall";" {{ return msgcall }}
                     | conditional {{ return conditional }}
+
+    rule msgcall: MSGCALL"[(]"exprcomp  {{ e = MsgCall(exprcomp) }}
+                         (","exprcomp  {{ e.add_arg(exprcomp) }}
+                         )*
+                        "[)]"   {{ return e }}
 
     rule conditional: IF"[(]" exprcomp "[)]" block {{ i = Cond(exprcomp, block) }}
                       (ELIF"[(]" exprcomp "[)]" block)* {{ i.add_elif(exprcomp, block) }}

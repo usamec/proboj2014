@@ -29,6 +29,7 @@ class Unit {
   void WRITE(int num);
   void GRAB();
   void PUT();
+  void MSG(int unit_id, vector<int> msg);
   unordered_map<string, int> data;
   unordered_map<int, int> inbox;
   unordered_map<int, unordered_map<int, int>> AREA_PL, AREA_BASE, AREA_WALL, AREA_ZUCK, AREA_MARKS;
@@ -41,6 +42,7 @@ struct Game {
   int units_per_team;
   
   vector<Unit*> units;
+  vector<pair<int, pair<int, int>>> cur_msgs;
 };
 
 

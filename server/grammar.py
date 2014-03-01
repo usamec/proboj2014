@@ -18,11 +18,11 @@ class ProbojScanner(runtime.Scanner):
         ('"<"', re.compile('<')),
         ('"<="', re.compile('<=')),
         ('"=="', re.compile('==')),
-        ('","', re.compile(',')),
         ('"="', re.compile('=')),
         ('"}"', re.compile('}')),
         ('"{"', re.compile('{')),
         ('"[)]"', re.compile('[)]')),
+        ('","', re.compile(',')),
         ('"[(]"', re.compile('[(]')),
         ('";"', re.compile(';')),
         ('\\s+', re.compile('\\s+')),
@@ -30,7 +30,8 @@ class ProbojScanner(runtime.Scanner):
         ('ELIF', re.compile('elif')),
         ('IF', re.compile('if')),
         ('ELSE', re.compile('else')),
-        ('CALL', re.compile('(PUT|MSG|MOVE|GRAB|WRITE)')),
+        ('CALL', re.compile('(PUT|MOVE|GRAB|WRITE|ATTACK)')),
+        ('MSGCALL', re.compile('MSG')),
         ('MSG', re.compile('INBOX')),
         ('AREA', re.compile('(AREA_PL|AREA_BASE|AREA_WALL|AREA_ZUCK|AREA_MARKS)')),
         ('RAND', re.compile('RAND')),
@@ -45,7 +46,7 @@ class Proboj(runtime.Parser):
     def goal(self, _parent=None):
         _context = self.Context(_parent, self._scanner, 'goal', [])
         g = []
-        while self._peek('END', 'ID', 'CALL', 'IF', context=_context) != 'END':
+        while self._peek('END', 'ID', 'CALL', 'MSGCALL', 'IF', context=_context) != 'END':
             statement = self.statement(_context)
             g.append(statement)
         END = self._scan('END', context=_context)
@@ -53,7 +54,7 @@ class Proboj(runtime.Parser):
 
     def statement(self, _parent=None):
         _context = self.Context(_parent, self._scanner, 'statement', [])
-        _token = self._peek('ID', 'CALL', 'IF', context=_context)
+        _token = self._peek('ID', 'CALL', 'MSGCALL', 'IF', context=_context)
         if _token == 'ID':
             assignment = self.assignment(_context)
             self._scan('";"', context=_context)
@@ -62,9 +63,26 @@ class Proboj(runtime.Parser):
             call = self.call(_context)
             self._scan('";"', context=_context)
             return call
+        elif _token == 'MSGCALL':
+            msgcall = self.msgcall(_context)
+            self._scan('";"', context=_context)
+            return msgcall
         else: # == 'IF'
             conditional = self.conditional(_context)
             return conditional
+
+    def msgcall(self, _parent=None):
+        _context = self.Context(_parent, self._scanner, 'msgcall', [])
+        MSGCALL = self._scan('MSGCALL', context=_context)
+        self._scan('"[(]"', context=_context)
+        exprcomp = self.exprcomp(_context)
+        e = MsgCall(exprcomp)
+        while self._peek('"[)]"', '","', context=_context) == '","':
+            self._scan('","', context=_context)
+            exprcomp = self.exprcomp(_context)
+            e.add_arg(exprcomp)
+        self._scan('"[)]"', context=_context)
+        return e
 
     def conditional(self, _parent=None):
         _context = self.Context(_parent, self._scanner, 'conditional', [])
@@ -74,14 +92,14 @@ class Proboj(runtime.Parser):
         self._scan('"[)]"', context=_context)
         block = self.block(_context)
         i = Cond(exprcomp, block)
-        while self._peek('ELIF', 'ELSE', 'END', '"}"', 'ID', 'CALL', 'IF', context=_context) == 'ELIF':
+        while self._peek('ELIF', 'ELSE', 'END', '"}"', 'ID', 'CALL', 'MSGCALL', 'IF', context=_context) == 'ELIF':
             ELIF = self._scan('ELIF', context=_context)
             self._scan('"[(]"', context=_context)
             exprcomp = self.exprcomp(_context)
             self._scan('"[)]"', context=_context)
             block = self.block(_context)
         i.add_elif(exprcomp, block)
-        if self._peek('ELSE', 'ELIF', 'END', '"}"', 'ID', 'CALL', 'IF', context=_context) == 'ELSE':
+        if self._peek('ELSE', 'ELIF', 'END', '"}"', 'ID', 'CALL', 'MSGCALL', 'IF', context=_context) == 'ELSE':
             ELSE = self._scan('ELSE', context=_context)
             block = self.block(_context)
         i.add_else(block)
@@ -91,7 +109,7 @@ class Proboj(runtime.Parser):
         _context = self.Context(_parent, self._scanner, 'block', [])
         self._scan('"{"', context=_context)
         g = []
-        while self._peek('"}"', 'ID', 'CALL', 'IF', context=_context) != '"}"':
+        while self._peek('"}"', 'ID', 'CALL', 'MSGCALL', 'IF', context=_context) != '"}"':
             statement = self.statement(_context)
             g.append(statement)
         self._scan('"}"', context=_context)
