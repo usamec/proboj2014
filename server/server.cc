@@ -63,6 +63,19 @@ Game LoadGame(char* fn) {
   return g;
 };
 
+void Unit::MSG(int unit_id, vector<int> msg) {
+  for (int i = 0; i < g->units.size(); i++) {
+    if (g->units[i]->player_id == player_id && g->units[i]->id == unit_id) {
+      g->cur_msgs.push_back(make_pair(player_id, make_pair(id, unit_id)));
+      g->units[i]->inbox.clear();
+      g->units[i]->inbox[0] = msg.size();
+      for (int j = 0; j < msg.size(); j++) {
+        g->units[i]->inbox[j+1] = msg[j];
+      }
+    }
+  }
+}
+
 void Unit::Step() {
   // TODO: inbox
   data["X"] = x;
@@ -104,6 +117,7 @@ void Unit::Step() {
     }
   }
   RealStep();
+  inbox.clear();
 }
 
 void Unit::MOVE(int yy, int xx) {
@@ -216,6 +230,17 @@ int main(int argc, char** argv) {
     for (int i = 0; i < scores.size(); i++) {
       fprintf(flog, "%d%c", scores[i], i + 1 == scores.size() ? ']' : ',');
     }
+    fprintf(flog, ", \"msgs\": [");
+    for (int i = 0; i < g.cur_msgs.size(); i++) {
+      fprintf(flog, "{\"player_id\": %d, \"from\": %d, \"to\": %d}",
+              g.cur_msgs[i].first, g.cur_msgs[i].second.first,
+              g.cur_msgs[i].second.second);
+      if (i + 1 < g.cur_msgs.size()) {
+        fprintf(flog, ",");
+      }
+    }
+    fprintf(flog, "]");
+    g.cur_msgs.clear();
     fprintf(flog, "}%c", st + 1 == n_steps ? ']' : ','); 
   }
   fprintf(flog, "}");

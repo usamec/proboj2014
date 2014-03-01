@@ -1,6 +1,8 @@
 if (ID == 1) {
   a = AREA_PL[-1,-1];
+  b = INBOX[3];
   MOVE(RAND%3-1, RAND%3-1);
+  MSG(2, 47, 42);
 } elif (ID == 2) {
   c = b;
 } else {

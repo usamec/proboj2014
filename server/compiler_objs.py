@@ -80,6 +80,25 @@ class Assignment:
     return ''.join(ret_parts)
 
 
+class MsgCall:
+  def __init__(self, who):
+    self.who = who
+    self.args = []
+
+  def add_arg(self, arg):
+    self.args.append(arg)
+
+  def output(self, indent):
+    ret_parts = []
+    ret_parts.append(" "*indent)
+    ret_parts.append("MSG(")
+    ret_parts.append(self.who.output())
+    ret_parts.append(", vector<int>({");
+    args_str = [x.output() for x in self.args]
+    ret_parts.append(",".join(args_str))
+    ret_parts.append("}));")
+    return ''.join(ret_parts)
+
 class Call:
   def __init__(self, what):
     self.what = what
