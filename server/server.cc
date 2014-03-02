@@ -88,6 +88,7 @@ void Unit::Step() {
   putted = false;
   grabbed = false;
   written = false;
+  attacked = false;
   AREA_PL.clear();
   AREA_BASE.clear();
   AREA_WALL.clear();
@@ -120,6 +121,37 @@ void Unit::Step() {
   inbox.clear();
 }
 
+void Unit::ATTACK(int yy, int xx) {
+  if (attacked) return;
+  attacked = true;
+  yy = max(-1, min(1, yy));
+  xx = max(-1, min(1, xx));
+  int px = x+xx;
+  int py = y+yy;
+  for (int i = 0; i < g->units.size(); i++) {
+    if (g->units[i]->x == px && g->units[i]->y == py) {
+      printf("attack\n");
+      if (rand() % 3 == 0) {
+        g->units[i]->data.clear();
+        g->units[i]->inbox.clear();
+        int nx, ny;
+        GetEmptyPos(*g, g->units[i]->player_id, ny, nx);
+        g->units[i]->y = ny;
+        g->units[i]->x = nx;
+        g->cur_attacks.push_back(Attack(make_pair(player_id, id),
+                                        make_pair(g->units[i]->player_id,
+                                                  g->units[i]->id),
+                                        true));
+      } else {
+        g->cur_attacks.push_back(Attack(make_pair(player_id, id),
+                                        make_pair(g->units[i]->player_id,
+                                                  g->units[i]->id),
+                                        false));
+      }
+    }
+  }
+}
+
 void Unit::MOVE(int yy, int xx) {
   if (moved) return;
   moved = true;
@@ -132,7 +164,14 @@ void Unit::MOVE(int yy, int xx) {
   x = max(0, min((int)g->g[0].size()-1, x));
   y = max(0, min((int)g->g.size()-1, y));
   // TODO: check other units
-  if (g->g[y][x].wall == true) {
+  bool other_unit = false;
+  for (int i = 0; i < g->units.size(); i++) {
+    if (g->units[i] == this) continue;
+    if (g->units[i]->x == x && g->units[i]->y == y) {
+      other_unit = true;
+    }
+  }
+  if (g->g[y][x].wall == true || other_unit == true) {
     x = px;
     y = py;
   }
@@ -182,7 +221,7 @@ int main(int argc, char** argv) {
   printf("init done\n");
 
   fprintf(flog, ", \"steps\": [");
-  int n_steps = 20;
+  int n_steps = 200;
   int n_zucker = 10;
   for (int st = 0; st < n_steps; st++) {
     vector<pair<int, int>> zucker_change;
@@ -198,12 +237,12 @@ int main(int argc, char** argv) {
         }
       }
     }
-    // TODO: scores
-    printf("ss %d %d\n", g.units[st%g.units.size()]->y,
-           g.units[st%g.units.size()]->x);
     g.units[st%g.units.size()]->Step();
-    printf("ee %d %d\n", g.units[st%g.units.size()]->y,
-           g.units[st%g.units.size()]->x);
+
+    for (int i = 0; i < g.units.size(); i++) {
+      printf("(%d, %d) ", g.units[i]->x, g.units[i]->y);
+    }
+    printf("\n");
 
     // Logging
     fprintf(flog, "{\"units\": [");
@@ -241,6 +280,19 @@ int main(int argc, char** argv) {
     }
     fprintf(flog, "]");
     g.cur_msgs.clear();
+    fprintf(flog, ", \"attacks\": [");
+    for (int i = 0; i < g.cur_attacks.size(); i++) {
+      fprintf(flog, "{\"from_player\": %d, \"from_id\": %d, "
+                    "\"to_player\": %d, \"to_id\": %d, \"success\": %d}",
+                    g.cur_attacks[i].from.first, g.cur_attacks[i].from.second,
+                    g.cur_attacks[i].to.first, g.cur_attacks[i].to.second,
+                    (int)g.cur_attacks[i].success);
+      if (i + 1 < g.cur_msgs.size()) {
+        fprintf(flog, ",");
+      }
+    }
+    fprintf(flog, "]");
+    g.cur_attacks.clear();
     fprintf(flog, "}%c", st + 1 == n_steps ? ']' : ','); 
   }
   fprintf(flog, "}");

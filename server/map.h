@@ -21,11 +21,12 @@ class Unit {
  public:
   int x, y, id, player_id, carry;
   Game *g;
-  bool moved, putted, grabbed, written;
+  bool moved, putted, grabbed, written, attacked;
 
   void Step();
   virtual void RealStep()=0;
   void MOVE(int yy, int xx);
+  void ATTACK(int yy, int xx);
   void WRITE(int num);
   void GRAB();
   void PUT();
@@ -37,12 +38,23 @@ class Unit {
 
 typedef vector<vector<Point>> Grid;
 
+struct Attack {
+  pair<int, int> from;
+  pair<int, int> to;
+  bool success;
+
+  Attack() {}
+  Attack(pair<int, int> f, pair<int, int> t, bool s) :
+      from(f), to(t), success(s) {}
+};
+
 struct Game {
   Grid g;
   int units_per_team;
   
   vector<Unit*> units;
   vector<pair<int, pair<int, int>>> cur_msgs;
+  vector<Attack> cur_attacks;
 };
 
 
