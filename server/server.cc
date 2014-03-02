@@ -134,6 +134,7 @@ void Unit::ATTACK(int yy, int xx) {
       if (rand() % 3 == 0) {
         g->units[i]->data.clear();
         g->units[i]->inbox.clear();
+        g->units[i]->carry = 0;
         int nx, ny;
         GetEmptyPos(*g, g->units[i]->player_id, ny, nx);
         g->units[i]->y = ny;
@@ -186,10 +187,10 @@ void Unit::WRITE(int num) {
 void Unit::GRAB() {
   if (grabbed) return;
   grabbed = true;
-  if (g->g[y][x].zucker > 0) {
+  if (g->g[y][x].zucker > 0 && carry < 10) {
     g->g[y][x].zucker-=1;
+    carry += 1;
   }
-  carry += 1;
 }
 
 void Unit::PUT() {
