@@ -21,7 +21,7 @@ class Unit {
  public:
   int x, y, id, player_id, carry;
   Game *g;
-  bool moved, putted, grabbed, written, attacked;
+  bool act;
 
   void Step();
   virtual void RealStep()=0;

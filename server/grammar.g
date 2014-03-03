@@ -31,7 +31,7 @@ parser Proboj:
                         "[)]"   {{ return e }}
 
     rule conditional: IF"[(]" exprcomp "[)]" block {{ i = Cond(exprcomp, block) }}
-                      (ELIF"[(]" exprcomp "[)]" block)* {{ i.add_elif(exprcomp, block) }}
+                      (ELIF"[(]" exprcomp "[)]" block {{ i.add_elif(exprcomp, block) }})*
                       (ELSE block)? {{i.add_else(block) }}
                       {{ return i }}
 
@@ -47,10 +47,10 @@ parser Proboj:
 
     rule exprcomp: expr0 {{ e = Expr(expr0) }}
                    ( "==" expr0  {{ e.add_op("==", expr0) }}
-                   | "<=" expr0  {{ e.add_op("<", expr0) }}
+                   | "<=" expr0  {{ e.add_op("<=", expr0) }}
                    | "<" expr0  {{ e.add_op("<", expr0) }}
-                   | ">" expr0  {{ e.add_op("<", expr0) }}
-                   | ">=" expr0  {{ e.add_op("<", expr0) }}
+                   | ">" expr0  {{ e.add_op(">", expr0) }}
+                   | ">=" expr0  {{ e.add_op(">=", expr0) }}
                    )*  {{ return e }}
 
 

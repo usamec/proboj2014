@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <algorithm>
 #include <unordered_map>
+#include <cassert>
 
 vector<int> scores;
 
@@ -10,9 +11,11 @@ void GetEmptyPos(Game &g, int team, int &y, int &x) {
   for (int i = 0; i < g.g.size(); i++) {
     for (int j = 0; j < g.g[i].size(); j++) {
       if (g.g[i][j].base == team) {
+        printf("base %d %d\n", i, j);
         bool occ = false;
         for (int k = 0; k < g.units.size(); k++) {
           if (g.units[k]->y == i && g.units[k]->x == j) {
+            printf("occ\n");
             occ = true;
             break;
           }
@@ -25,6 +28,7 @@ void GetEmptyPos(Game &g, int team, int &y, int &x) {
       }
     }
   }
+  assert(false);
 }
 
 Game LoadGame(char* fn) {
@@ -40,7 +44,7 @@ Game LoadGame(char* fn) {
       if (x < 0) {
         g.g[i][j].wall = true;
       } else if (x >= 1) {
-        g.g[i][j].base = (int)(x-1);
+        g.g[i][j].base = (int)(x);
       }
       else g.g[i][j].zucker_prob = x;
       g.g[i][j].marks.resize(n_players);
@@ -49,7 +53,7 @@ Game LoadGame(char* fn) {
   for (int i = 0; i < n_players; i++) {
     for (int j = 0; j < g.units_per_team; j++) {
       int x, y;
-      GetEmptyPos(g, i, y, x);
+      GetEmptyPos(g, i+1, y, x);
       Unit* u = CreatePlayerUnit(i);
       u->y = y;
       u->x = x;
@@ -84,11 +88,7 @@ void Unit::Step() {
   data["ID"] = id;
   data["MAX_ID"] = g->units_per_team;
   data["CARRY"] = carry;
-  moved = false;
-  putted = false;
-  grabbed = false;
-  written = false;
-  attacked = false;
+  act = false;
   AREA_PL.clear();
   AREA_BASE.clear();
   AREA_WALL.clear();
@@ -98,8 +98,8 @@ void Unit::Step() {
   for (int i = -sur; i <= sur; i++) {
     for (int j = -sur; j <= sur; j++) {
       if (abs(i) + abs(j) > sur) continue;
-      int ry = y - i;
-      int rx = x - j;
+      int ry = y + i;
+      int rx = x + j;
       if (ry < 0 || rx < 0 || ry >= g->g.size() || rx >= g->g[0].size()) continue;
       AREA_PL[i][j] = 0;
       for (int k = 0; k < g->units.size(); k++) {
@@ -122,20 +122,25 @@ void Unit::Step() {
 }
 
 void Unit::ATTACK(int yy, int xx) {
-  if (attacked) return;
-  attacked = true;
+  if (act) return;
+  act = true;
   yy = max(-1, min(1, yy));
   xx = max(-1, min(1, xx));
   int px = x+xx;
   int py = y+yy;
+  printf("attack %d %d %d %d\n", xx, yy, px, py);
   for (int i = 0; i < g->units.size(); i++) {
     if (g->units[i]->x == px && g->units[i]->y == py) {
-      printf("attack\n");
+      printf("attack from %d %d to %d %d ff %d %d tt %d %d\n", x, y, px, py, player_id, id,
+             g->units[i]->player_id, g->units[i]->id);
       if (rand() % 3 == 0) {
+        printf("kill\n");
         g->units[i]->data.clear();
         g->units[i]->inbox.clear();
         g->units[i]->carry = 0;
         int nx, ny;
+        g->units[i]->x = -1;
+        g->units[i]->y = -1;
         GetEmptyPos(*g, g->units[i]->player_id, ny, nx);
         g->units[i]->y = ny;
         g->units[i]->x = nx;
@@ -154,14 +159,15 @@ void Unit::ATTACK(int yy, int xx) {
 }
 
 void Unit::MOVE(int yy, int xx) {
-  if (moved) return;
-  moved = true;
+  if (act) return;
+  act = true;
   yy = max(-1, min(1, yy));
   xx = max(-1, min(1, xx));
   int px = x;
   int py = y;
   x += xx;
   y += yy;
+  printf("move %d %d %d %d %d %d\n", player_id, id, xx, yy, x, y);
   x = max(0, min((int)g->g[0].size()-1, x));
   y = max(0, min((int)g->g.size()-1, y));
   // TODO: check other units
@@ -179,14 +185,14 @@ void Unit::MOVE(int yy, int xx) {
 }
 
 void Unit::WRITE(int num) {
-  if (written) return;
-  written = true;
+  if (act) return;
+  act = true;
   g->g[y][x].marks[player_id-1] = num;
 }
 
 void Unit::GRAB() {
-  if (grabbed) return;
-  grabbed = true;
+  if (act) return;
+  act = true;
   if (g->g[y][x].zucker > 0 && carry < 10) {
     g->g[y][x].zucker-=1;
     carry += 1;
@@ -194,8 +200,8 @@ void Unit::GRAB() {
 }
 
 void Unit::PUT() {
-  if (putted) return;
-  putted = true;
+  if (act) return;
+  act = true;
   if (g->g[y][x].base == player_id - 1) {
     scores[player_id-1] += carry;
     carry = 0;

@@ -92,13 +92,13 @@ class Proboj(runtime.Parser):
         self._scan('"[)]"', context=_context)
         block = self.block(_context)
         i = Cond(exprcomp, block)
-        while self._peek('ELIF', 'ELSE', 'END', '"}"', 'ID', 'CALL', 'MSGCALL', 'IF', context=_context) == 'ELIF':
+        while self._peek('ELSE', 'ELIF', 'END', '"}"', 'ID', 'CALL', 'MSGCALL', 'IF', context=_context) == 'ELIF':
             ELIF = self._scan('ELIF', context=_context)
             self._scan('"[(]"', context=_context)
             exprcomp = self.exprcomp(_context)
             self._scan('"[)]"', context=_context)
             block = self.block(_context)
-        i.add_elif(exprcomp, block)
+            i.add_elif(exprcomp, block)
         if self._peek('ELSE', 'ELIF', 'END', '"}"', 'ID', 'CALL', 'MSGCALL', 'IF', context=_context) == 'ELSE':
             ELSE = self._scan('ELSE', context=_context)
             block = self.block(_context)
@@ -150,7 +150,7 @@ class Proboj(runtime.Parser):
             elif _token == '"<="':
                 self._scan('"<="', context=_context)
                 expr0 = self.expr0(_context)
-                e.add_op("<", expr0)
+                e.add_op("<=", expr0)
             elif _token == '"<"':
                 self._scan('"<"', context=_context)
                 expr0 = self.expr0(_context)
@@ -158,11 +158,11 @@ class Proboj(runtime.Parser):
             elif _token == '">"':
                 self._scan('">"', context=_context)
                 expr0 = self.expr0(_context)
-                e.add_op("<", expr0)
+                e.add_op(">", expr0)
             else: # == '">="'
                 self._scan('">="', context=_context)
                 expr0 = self.expr0(_context)
-                e.add_op("<", expr0)
+                e.add_op(">=", expr0)
         return e
 
     def expr0(self, _parent=None):
