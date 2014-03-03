@@ -1,0 +1,22 @@
+Pustanie:
+python compile_player.py test_player.au 1 >player1.h
+g++ -O2 server.cc -std=gnu++0x && ./a.out test_map.m test.log
+vyrobi to test.log a ten treba dat opserveru
+
+NATVRDO PREMMENE:
+PL_ID, ID, X, Y, MAX_ID, CARRY
+
+PL_ID, ID ide od 1
+X, Y idu o 0
+CARRY nema limit
+
+AREA_PL:
+0 - nic
++x - hrac x
+-x - moja jednotka s id x
+
+INE AREAS:
+AREA_BASE
+AREA_WALL
+AREA_ZUCK
+AREA_MARKS
