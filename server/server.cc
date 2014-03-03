@@ -11,11 +11,9 @@ void GetEmptyPos(Game &g, int team, int &y, int &x) {
   for (int i = 0; i < g.g.size(); i++) {
     for (int j = 0; j < g.g[i].size(); j++) {
       if (g.g[i][j].base == team) {
-        printf("base %d %d\n", i, j);
         bool occ = false;
         for (int k = 0; k < g.units.size(); k++) {
           if (g.units[k]->y == i && g.units[k]->x == j) {
-            printf("occ\n");
             occ = true;
             break;
           }
