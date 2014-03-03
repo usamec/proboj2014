@@ -63,7 +63,7 @@ def getInput():
     mapa = funnyStruct['map']
     
     #mapa = {'c':100, 'r':100, 'data': [[0 for j in range(100)] for i in range(100)]}
-    mapa = {'c':10, 'r':10, 'data': [[0 for j in range(10)] for i in range(10)]}
+    #mapa = {'c':10, 'r':10, 'data': [[0 for j in range(10)] for i in range(10)]}
     
     steps = funnyStruct['steps']
     cukor = [ [0 for i in range(mapa['c'])] for j in range(mapa['r']) ]
