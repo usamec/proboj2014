@@ -1,0 +1,1 @@
+../server/compile_player.py

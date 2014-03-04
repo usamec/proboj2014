@@ -1,0 +1,45 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Proboj</title>
+  <meta name="description" content="Proboj">
+
+</head>
+
+<body>
+{% with messages = get_flashed_messages(with_categories=True) %}
+{% if messages %}
+<ul class=flashes>
+{% for category, message in messages %}
+{% if category=="error" %}
+<li><pre>{{ message }}</pre></li>
+{% else %}
+<li>{{ message }}</li>
+{% endif %}
+{% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+
+<a href="/static/server.zip">Stiahni server</a>
+
+<br/>
+
+{% if name %}
+Logged as {{ name }}.
+<a href="/logout">Logout</a><br/>
+<form action="upload" method="post" enctype="multipart/form-data">
+<input type="file" name="file"/>
+<input type="submit" value="Submituj" />
+</form>
+
+{% else %}
+<form action="login" method="post">
+Heslo:<input type="password" name="password" />
+<input type="submit" value"Login" />
+</form>
+{% endif %}
+
+</body>
+</html>
