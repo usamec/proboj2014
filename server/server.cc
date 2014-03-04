@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <unordered_map>
 #include <cassert>
+#include <ctime>
 
 vector<int> scores;
 
@@ -225,6 +226,7 @@ void LogMap(FILE *flog, Game &g) {
 }
 
 int main(int argc, char** argv) {
+  srand(time(NULL));
   Game g = LoadGame(argv[1]);
   FILE* flog = fopen(argv[2], "w");
   fprintf(flog, "{");
@@ -309,4 +311,12 @@ int main(int argc, char** argv) {
   fprintf(flog, "}");
 
   fclose(flog);
+
+  string sc(argv[2]);
+  sc += ".scr";
+  FILE *fscr = fopen(sc.c_str(), "w");
+  for (int i = 0; i < scores.size(); i++) {
+    fprintf(fscr, "%d\n", scores[i]);
+  }
+  fclose(fscr);
 }
