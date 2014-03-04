@@ -16,7 +16,10 @@ def precompile(players):
     usage()
 
   for i, x in enumerate(players):
-    os.system("python compile_player.py %s %d >player%d.h" % (x, i+1, i+1))
+    ret = os.system("python compile_player.py %s %d >player%d.h" % (x, i+1, i+1))
+    if ret != 0:
+      print "failed compilation of player %d" % (i+1)
+      sys.exit(1)
 
   f = open("game_config.h", "w")
   print >>f, "#ifndef GAME_CONFIG_H__"
@@ -35,7 +38,10 @@ def precompile(players):
 
 
 def compile():
-  os.system("g++ -O2 server.cc -std=gnu++0x -o server")
+  ret = os.system("g++ -O2 server.cc -std=gnu++0x -o server")
+  if ret != 0:
+    print "failed compilation of server"
+    sys.exit(1)
 
 if sys.argv[1] == 'all':
   precompile(sys.argv[2:])
