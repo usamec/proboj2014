@@ -52,7 +52,7 @@ Game LoadGame(char* fn) {
     for (int j = 0; j < g.units_per_team; j++) {
       int x, y;
       GetEmptyPos(g, i+1, y, x);
-      Unit* u = CreatePlayerUnit(i);
+      Unit* u = CreatePlayerUnit(i+1);
       u->y = y;
       u->x = x;
       u->id = j+1;
@@ -109,7 +109,7 @@ void Unit::Step() {
         }
       }
 
-      AREA_BASE[i][j] = g->g[ry][rx].base+1;
+      AREA_BASE[i][j] = g->g[ry][rx].base;
       AREA_WALL[i][j] = g->g[ry][rx].wall;
       AREA_ZUCK[i][j] = g->g[ry][rx].zucker;
       AREA_MARKS[i][j] = g->g[ry][rx].marks[player_id-1];
@@ -190,20 +190,26 @@ void Unit::WRITE(int num) {
 
 void Unit::GRAB() {
   if (act) return;
+  printf("GRAB ");
   act = true;
   if (g->g[y][x].zucker > 0 && carry < 10) {
+    printf("OK");
     g->g[y][x].zucker-=1;
     carry += 1;
   }
+  printf("\n");
 }
 
 void Unit::PUT() {
   if (act) return;
   act = true;
-  if (g->g[y][x].base == player_id - 1) {
+  printf("PUT ");
+  if (g->g[y][x].base == player_id) {
+    printf("OK %d", carry);
     scores[player_id-1] += carry;
     carry = 0;
   }
+  printf("\n");
 }
 
 void LogMap(FILE *flog, Game &g) {

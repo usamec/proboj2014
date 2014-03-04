@@ -1,7 +1,10 @@
 Pustanie:
-python compile_player.py test_player.au 1 >player1.h
-g++ -O2 server.cc -std=gnu++0x && ./a.out test_map.m test.log
+python compile_game.py all test_player.au iny_player.au
+./server test_map.m test.log
 vyrobi to test.log a ten treba dat opserveru
+
+Compile game je na dve fazy, da sa volat aj python compile_game.py precompile ... a potom
+manualne editovat playerX.h a nasledne zavolat python compile_game.py compile
 
 NATVRDO PREMMENE:
 PL_ID, ID, X, Y, MAX_ID, CARRY
