@@ -11,7 +11,7 @@ PL_ID, ID, X, Y, MAX_ID, CARRY
 
 PL_ID, ID ide od 1
 X, Y idu o 0
-CARRY nema limit
+CARRY ma limit 10
 
 AREA_PL:
 0 - nic

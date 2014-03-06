@@ -83,6 +83,8 @@ void Unit::Step() {
   // TODO: inbox
   data["X"] = x;
   data["Y"] = y;
+  data["R"] = g->g.size();
+  data["C"] = g->g[0].size();
   data["PL_ID"] = player_id;
   data["ID"] = id;
   data["MAX_ID"] = g->units_per_team;

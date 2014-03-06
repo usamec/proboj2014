@@ -56,5 +56,80 @@ Heslo:<input type="password" name="password" />
 <br/>
 {% endfor %}
 
+<h2>Manuál</h2>
+
+<p>
+Server si po stiahnutí skompilujete nasledovne:
+<pre>
+python2 compile_game.py all test_player.au iny_player.au
+./server test_map.m test.log
+</pre>
+Server vyrobí súbor test.log a ten podhodíte observeru.
+</p>
+
+<p>
+Pokiaľ chcete robiť debug výstupy počas behu vášho hráča, tak najprv pustite
+<pre>
+python2 compile_game.py precompile test_player.au iny_player.au
+</pre>
+A následne upravte playerX.h a pustite:
+<pre>
+python2 compile_game.py compile
+</pre>
+</p>
+
+<h3>Jazyk AU</h3>
+
+Jazyk je veľmi podobný osekanému C.
+Neexistujú tam deklarácie, všetko sú len celé čísla (int) a pokiaľ niečo neinicializované
+použijete bude tam hodnota 0. Medzi ťahmi vám obsah premenných ostáva.
+
+Takisto neexistujú cykly, iba podmienky.
+Tak navyše môžu byt iba tvaru :
+<pre>
+if (...) {
+} elif (...) {
+} else {
+}
+</pre>
+Časti elif môže byť aj viac. Else je nepovinný. Ale else if neexistuje.
+
+Existuje niekoľko špeciálnych premenných, ktoré sa na začiatku ťahu naplnia (vy si ich môžete
+prepísať čím chcete, ale neodporúča sa):
+<ul>
+<li>PL_ID - id vášho hráča (čísluje sa od 1)</li>
+<li>ID - id panáka (čísluje sa od 1)</li>
+<li>Y, X - súradnice, číslované od 0</li>
+<li>R, C - rozmery mapy</li>
+<li>CARRY - váš aktuálny náklad</li>
+</ul>
+
+Pokiaľ chcete náhodné číslo použite token RAND, napr.:
+<pre>
+abc = RAND % 17;
+</pre>
+
+Ďalej máte nejake informácie o stave mapy okolo seba (do manhatanovskej vzdialenosti 2):
+
+<ul>
+<li>AREA_PL[y,x] - kto sa nachádza na pozícii (Y+y,X+x): 0 - nič, +x panák hráča s číslom x, -x váš panák s číslom -x</li>
+<li>AREA_BASE[y,x] - koho základňa sa nachádza na pozícii (Y+y,X+x)</li>
+<li>AREA_WALL[y,x] - 1 ak sa na pozícii (Y+y,X+x) nachádza prekážka</li>
+<li>AREA_ZUCK[y,x] - množstvo cukru na pozícii (Y+y,X+x)</li>
+<li>AREA_MARKS[y,x] - vaša značka na pozícii (Y+y,X+x)</li>
+</ul>
+
+Počas ťahu môžete urobiť jednu z nasledujúcich akcíí:
+<ul>
+<li>MOVE(y,x) - pohyb, v každej súradnici max o 1</li>
+<li>GRAB() - zober jeden cukor odtiaľ kde stojíš</li>
+<li>PUT() - pokiaľ si vo svojej základni polož cukor</li>
+<li>WRITE(w) - zapiš na svoju pozíciu číslo w</li>
+<li>ATTACK(y,x) - zaútoč na pozíciu (Y+y, X+x), šanca na zabitie je 1/3, zabitá jednotka príde o
+všetko, zresetuje sa a skončí v báze</li>
+</ul>
+
+TODO MSGS
+
 </body>
 </html>
