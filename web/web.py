@@ -63,14 +63,35 @@ def upload():
       shutil.copy("uploads/%d/%s" % (user, filename), "players/%d.au" % user) 
       flash("Upload ok")
   return redirect(url_for('main'))
-     
+    
+def get_scores():
+  if os.path.exists("logs/scores.txt"):
+    f = open("logs/scores.txt")
+    scores = {NAMES[i]: int(x) for i,x in enumerate(f)}
+    f.close()
+  else:
+    scores = {x: 0 for x in NAMES}
+  return scores
+
+def get_last_games():
+  logs = sorted(filter(lambda x: x.endswith('.log'), os.listdir("logs")), reverse=True)[:3]
+  logs = [x[:-4] for x in logs]
+  last_games = []
+  for log in logs:
+    f = open("logs/%s.log.scr" % log)
+    scores = {NAMES[i]: int(x) for i,x in enumerate(f)}
+    f.close()
+    last_games.append({"name": log, "scores": scores})
+
+  return last_games
 
 @app.route('/')
 def main():
   user, name = get_user()
-  return render_template('index.html', user=user, name=name)
+  return render_template('index.html', user=user, name=name, scores=get_scores(),
+                         last_games=get_last_games())
 
 
 if __name__ == '__main__':
-  app.run(debug=True)
+  app.run(debug=True, host='0.0.0.0')
 

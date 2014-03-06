@@ -41,5 +41,20 @@ Heslo:<input type="password" name="password" />
 </form>
 {% endif %}
 
+<h2>Aktuálny stav</h2>
+{% for name, score in scores.iteritems() %}
+{{ name }}: {{ score }}<br/>
+{% endfor %}
+
+<h2>Posledné hry</h2>
+{% for g in last_games %}
+<a href="downgame/{{g.name}}">{{g.name}}</a>
+{% for name, score in g.scores.iteritems() %}
+{{ name }}: {{ score }};
+{% endfor %}
+
+<br/>
+{% endfor %}
+
 </body>
 </html>
