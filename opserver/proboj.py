@@ -186,17 +186,21 @@ def drawPlayers():
     for i, player in enumerate (dejeSa['units']):
         for minion in player:
             
-            cukr = iWanaRect(minion['x'],minion['y'],2)
-            pygame.draw.rect(DISPLAYSURF, getPlayerColor(i) , cukr)
-            DISPLAYSURF.blit(hracc, iWanaPoz(minion['x'],minion['y'], 20,30))
+            char = iWanaRect(minion['x'],minion['y'],2)
+            pygame.draw.rect(DISPLAYSURF, getPlayerColor(i) , char)
+            #DISPLAYSURF.blit(hracc, iWanaPoz(minion['x'],minion['y'], 20,30))
+            
     pass
-
+    
     
 def drawFight():
     """kresli boje"""
-    global dejeSa, velkost;
+    global velkost, dejeSa,steps;
+    if state >= len(steps): 
+        return
+    nex = steps[state] 
     
-    for msg in dejeSa['attacks']:
+    for i,msg in enumerate(nex['attacks']):
         plF = dejeSa['units'][msg['from_player']-1]
         plT = dejeSa['units'][msg['to_player']-1]
         
@@ -206,8 +210,28 @@ def drawFight():
         war = iWanaRect(float(fro['x']+to['x']) /2 ,float(fro['y']+to['y'])/2, (float (0-velkost)) /4)
         pygame.draw.rect(DISPLAYSURF, RED , war)
         
+        if msg['success']==1:
+            #zomri druheho
+            kil = iWanaRect(to['x'],to['y'],(float (0-velkost)/4))
+            pygame.draw.rect(DISPLAYSURF, RED, kil)
+            """
+            fightKill = BASICFONT.render('p: '+ str(msg['from_player']) , True, getPlayerColor(msg['from_player']-1)) 
+            fightRect = fightKill.get_rect()
+            fightRect.topright = (20+(i+1)*150, 600+20)
+            DISPLAYSURF.blit(fightKill, fightRect)
+            
+            fightKill = BASICFONT.render(' vyhral proti ', True, BLACK) 
+            fightRect = fightKill.get_rect()
+            fightRect.topleft = (20+(i+1)*150, 600+20)
+            DISPLAYSURF.blit(fightKill, fightRect)
+            
+            
+            fightKill = BASICFONT.render('p '+ str(msg['to_player']) , True, getPlayerColor(msg['to_player']-1)) 
+            fightRect = fightKill.get_rect()
+            fightRect.topleft = (100+(i+1)*150, 600+20)
+            DISPLAYSURF.blit(fightKill, fightRect)
+            """
         
-    
     pass
 
 def drawMsg():
@@ -227,14 +251,27 @@ def drawMsg():
 
     
 def getColor(coJe, cukor):
+    
     if coJe != 0:
         return BLACK
     else: 
         return (cukor*20, 200+ cukor*5, cukor*20)
 
 def getPlayerColor(kto):
-    return (100*kto,150, 100*kto)
-
+    """ vrati farbu hraca"""
+    if kto == 1:
+        return ( 255, 255, 0) #slniecko
+    if kto == 2:
+        return (0, 0, 200) # more
+    if kto == 3:
+        return (200, 0, 200)
+    if kto == 4:
+        return (255, 128 , 0)
+    if kto == 5:
+        return (0, 0, 0)
+    if kto == 0:
+        return (255,100,100)
+        
 
 def drawScore():
     global dejeSa, FPS
