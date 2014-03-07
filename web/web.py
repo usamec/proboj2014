@@ -10,7 +10,7 @@ import shutil
 UPLOAD_FOLDER = 'uploads'
 app = Flask(__name__)
 app.secret_key = 'A0Zr98j/dfdafdafdfa'
-from config import *
+from local_config import *
 
 def get_user():
   if 'user' in session:
