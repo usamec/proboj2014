@@ -129,7 +129,20 @@ Počas ťahu môžete urobiť jednu z nasledujúcich akcíí:
 všetko, zresetuje sa a skončí v báze</li>
 </ul>
 
-TODO MSGS
+Navyše počas ťahu môžete posielať správy iným hráčom.
+Správa posiela veľmi jednoducho:
+<pre>
+MSG(komu, 1, 2, 3);
+</pre>
+Správa môže obsahovať ľubovoľne veľa čísel. 
+
+Panáci správy aj prijímajú. Pokiaľ niekomu medzi ťahmi príde
+viac ako jedna správa, tak dostane len poslednú:
+V mieste INBOX[0] je dĺžka prijatej správy.
+V INBOX[i] je i-te číslo zo správy. Pokiaľ siahnete mimo
+rozsahu správy dostanete nulu.
+
+Testovacia mapa zatiaľ podporuje iba dvoch hračov, ktorý majú dvoch panákov.
 
 </body>
 </html>
