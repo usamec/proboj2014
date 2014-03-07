@@ -30,7 +30,8 @@ velkost = 0
 stav = "running"
 hracc = pygame.image.load('opserver/mravec-7.png')
 hracc = pygame.transform.scale(hracc,(15,20))
-
+marginTop, marginLeft = 20, 20
+counter = 0
 
 def main():
     global FPSCLOCK, DISPLAYSURF, BASICFONT
@@ -43,16 +44,15 @@ def main():
     pygame.display.set_caption('Cukor')
 
     
-    while True:
-        getInput()
-        runGame()
-        showStats()
+    getInput()
+    runGame()
+    showStats()
     pass
 
 def getInput():
     
     global mapa, steps, cukor
-    
+    raw = ""
     raw = raw_input()
     print "WANA BANANA?"
     funnyStruct = json.loads(raw)
@@ -74,7 +74,7 @@ def getInput():
     pass
 
 def runGame():
-    global FPSCLOCK, DISPLAYSURF, BASICFONT, FPS
+    global FPSCLOCK, DISPLAYSURF, BASICFONT, FPS, counter
     global mapa, steps, cukor, stav
     
     
@@ -90,6 +90,8 @@ def runGame():
     wanaHelp = False
     
     while True: # main game loop
+        if stav== "running":
+            counter+=1
         for event in pygame.event.get(): # event handling loop
             if event.type == QUIT:
                 terminate()
@@ -121,6 +123,7 @@ def runGame():
         drawMap()
         drawPlayers()
         drawMsg()
+        drawFight()
         drawScore()        
         
         if wanaHelp :
@@ -147,6 +150,7 @@ def gameUpdate():
     for c in dejeSa['zucker']:
         cukor[c['y']][c['x']] = c['new_ammount']
     
+    pprint.pprint(counter)
     pprint.pprint(dejeSa)
     pprint.pprint(cukor)
 
@@ -154,14 +158,16 @@ def gameUpdate():
 def iWanaRect(x, y, size):
     global mapa, velkost
     
-    iHaveX, iHavey = 600, 600
-    velkost = (min(iHaveX / mapa['c'] , iHavey / mapa['r']))
-    
-    
-    marginTop, marginLeft = 20, 20
+    iHaveX, iHaveY = 600, 600
+    velkost = (min(iHaveX / mapa['c'] , iHaveY / mapa['r']))
     
     return pygame.Rect(marginLeft + x*velkost - size, marginTop + y*velkost - size, velkost + size*2, velkost + size*2)
 
+def iWanaPoz(x,y,sizex,sizey):
+    """vrati pixelovu poziciu hraca na gride"""
+    
+    return (marginLeft + x*velkost - sizex/2 + velkost/2, marginTop + y*velkost - sizey/2 + velkost/2)
+    pass
 
 
 def drawMap():
@@ -174,17 +180,64 @@ def drawMap():
     pass
 
 def drawPlayers():
+    """nakresli hraca a zuckerbar"""
     global dejeSa, velkost
     
     for i, player in enumerate (dejeSa['units']):
         for minion in player:
-            character = iWanaRect(minion['x'],minion['y'],2)
-            pygame.draw.rect(DISPLAYSURF, getPlayerColor(i) , character)
-            DISPLAYSURF.blit(hracc, (20+minion['x']*velkost + velkost/2 - 10, 20+minion['y']*velkost + velkost/2 - 15) )
+            
+            char = iWanaRect(minion['x'],minion['y'],2)
+            pygame.draw.rect(DISPLAYSURF, getPlayerColor(i) , char)
+            #DISPLAYSURF.blit(hracc, iWanaPoz(minion['x'],minion['y'], 20,30))
+            
+    pass
+    
+    
+def drawFight():
+    """kresli boje"""
+    global velkost, dejeSa,steps;
+    if state >= len(steps): 
+        return
+    nex = steps[state] 
+    
+    for i,msg in enumerate(nex['attacks']):
+        plF = dejeSa['units'][msg['from_player']-1]
+        plT = dejeSa['units'][msg['to_player']-1]
+        
+        fro = plF[msg['from_id']-1]
+        to = plT[msg['to_id']-1]
+        
+        war = iWanaRect(float(fro['x']+to['x']) /2 ,float(fro['y']+to['y'])/2, (float (0-velkost)) /4)
+        pygame.draw.rect(DISPLAYSURF, RED , war)
+        
+        if msg['success']==1:
+            #zomri druheho
+            kil = iWanaRect(to['x'],to['y'],(float (0-velkost)/4))
+            pygame.draw.rect(DISPLAYSURF, RED, kil)
+            """
+            fightKill = BASICFONT.render('p: '+ str(msg['from_player']) , True, getPlayerColor(msg['from_player']-1)) 
+            fightRect = fightKill.get_rect()
+            fightRect.topright = (20+(i+1)*150, 600+20)
+            DISPLAYSURF.blit(fightKill, fightRect)
+            
+            fightKill = BASICFONT.render(' vyhral proti ', True, BLACK) 
+            fightRect = fightKill.get_rect()
+            fightRect.topleft = (20+(i+1)*150, 600+20)
+            DISPLAYSURF.blit(fightKill, fightRect)
+            
+            
+            fightKill = BASICFONT.render('p '+ str(msg['to_player']) , True, getPlayerColor(msg['to_player']-1)) 
+            fightRect = fightKill.get_rect()
+            fightRect.topleft = (100+(i+1)*150, 600+20)
+            DISPLAYSURF.blit(fightKill, fightRect)
+            """
+        
     pass
 
 def drawMsg():
     global dejeSa, velkost
+    
+    
     
     for msg in dejeSa['msgs']:
         pl = dejeSa['units'][msg['player_id']-1]
@@ -192,27 +245,46 @@ def drawMsg():
         to = pl[msg['to']-1]
         
         
-        pygame.draw.line(DISPLAYSURF, BLUE, (fro['x']*velkost+20+ velkost/2, fro['y']*velkost+20+ velkost/2), (to['x']*velkost+20+ velkost/2, to['y']*velkost+20+ velkost/2), 2)
+        pygame.draw.line(DISPLAYSURF, BLUE, iWanaPoz(fro['x'],fro['y'],0,0), iWanaPoz(to['x'],to['y'],0,0), 2)
         
     pass
 
     
 def getColor(coJe, cukor):
+    
     if coJe != 0:
         return BLACK
     else: 
         return (cukor*20, 200+ cukor*5, cukor*20)
 
 def getPlayerColor(kto):
-    return (100*kto,150, 100*kto)
-
+    """ vrati farbu hraca"""
+    if kto == 1:
+        return ( 255, 255, 0) #slniecko
+    if kto == 2:
+        return (0, 0, 200) # more
+    if kto == 3:
+        return (200, 0, 200)
+    if kto == 4:
+        return (255, 128 , 0)
+    if kto == 5:
+        return (0, 0, 0)
+    if kto == 0:
+        return (255,100,100)
+        
 
 def drawScore():
     global dejeSa, FPS
+    
+    scoreSurf = BASICFONT.render('FPS: '+ str(FPS)+ '  frame: ' + str(counter), True, BLACK) #funky options
+    scoreRect = scoreSurf.get_rect()
+    scoreRect.topright = (WINDOWWIDTH - 20, 20)
+    DISPLAYSURF.blit(scoreSurf, scoreRect)
+        
     for i,s in enumerate (dejeSa['scores']):
         scoreSurf = BASICFONT.render('player '+ str(i+1)+ ': ' + str(dejeSa['scores'][i]), True, getPlayerColor(i)) #funky options
         scoreRect = scoreSurf.get_rect()
-        scoreRect.topright = (WINDOWWIDTH - 20, 20*(i+1))
+        scoreRect.topright = (WINDOWWIDTH - 20, 20*(i+2))
         DISPLAYSURF.blit(scoreSurf, scoreRect)
     pass
     
