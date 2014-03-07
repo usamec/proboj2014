@@ -83,9 +83,13 @@ python2 compile_game.py compile
 Jazyk je veľmi podobný osekanému C.
 Neexistujú tam deklarácie, všetko sú len celé čísla (int) a pokiaľ niečo neinicializované
 použijete bude tam hodnota 0. Medzi ťahmi vám obsah premenných ostáva.
+Z aritmetických operácii fungujú:
++, -, *, /, %, &lt;, &lt;=, ==, &gt; &gt;, &&, ||
+
+Pokiaľ budete potrebovat bitwise magiu, tak sa ozvite, dorobíme.
 
 Takisto neexistujú cykly, iba podmienky.
-Tak navyše môžu byt iba tvaru :
+Tie navyše môžu byt iba tvaru :
 <pre>
 if (...) {
 } elif (...) {
@@ -142,7 +146,12 @@ V mieste INBOX[0] je dĺžka prijatej správy.
 V INBOX[i] je i-te číslo zo správy. Pokiaľ siahnete mimo
 rozsahu správy dostanete nulu.
 
-Testovacia mapa zatiaľ podporuje iba dvoch hračov, ktorý majú dvoch panákov.
+Testovacia mapa zatiaľ podporuje iba dvoch hračov, ktorý majú dvoch panákov. Ale existuje test_map2.m, ktorá je trochu väčšia. 
+
+Pokiaľ si chcete pozrieť hru tak vhodný príkaz je:
+<pre>
+python opserver/proboj.py <test.log
+</pre>
 
 </body>
 </html>

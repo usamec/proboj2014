@@ -235,15 +235,25 @@ int main(int argc, char** argv) {
   LogMap(flog, g);
   printf("init done\n");
 
+  vector<pair<int, int>> zucker_opts;
+  for (int i = 0; i < g.g.size(); i++) {
+    for (int j = 0; j < g.g[i].size(); j++) {
+      if (g.g[i][j].zucker_prob > 0) {
+        zucker_opts.push_back(make_pair(i, j)); 
+      }
+    }
+  }
+
   fprintf(flog, ", \"steps\": [");
-  int n_steps = 200;
+  int n_steps = 20000;
   int n_zucker = 10;
   for (int st = 0; st < n_steps; st++) {
     vector<pair<int, int>> zucker_change;
     // TODO: randomize steps
     for (int z = 0; z < n_zucker; z++) {
-      int y = rand()%g.g.size();
-      int x = rand()%g.g[0].size();
+      int co = rand()%zucker_opts.size();
+      int y = zucker_opts[co].first;
+      int x = zucker_opts[co].second;
       if (rand()%100000 < ((int)(100000*g.g[y][x].zucker_prob))) {
         if (g.g[y][x].zucker < 10) {
           g.g[y][x].zucker += 1;
