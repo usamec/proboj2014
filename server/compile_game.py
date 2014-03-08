@@ -16,7 +16,7 @@ def precompile(players):
     usage()
 
   for i, x in enumerate(players):
-    ret = os.system("python compile_player.py %s %d >player%d.h" % (x, i+1, i+1))
+    ret = os.system("python2 compile_player.py %s %d >player%d.h" % (x, i+1, i+1))
     if ret != 0:
       print "failed compilation of player %d" % (i+1)
       sys.exit(1)

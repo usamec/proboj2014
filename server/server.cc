@@ -250,7 +250,7 @@ int main(int argc, char** argv) {
   }
 
   fprintf(flog, ", \"steps\": [");
-  int n_steps = 20000;
+  int n_steps = 5000;
   int n_zucker = 10;
   for (int st = 0; st < n_steps; st++) {
     vector<pair<int, int>> zucker_change;
