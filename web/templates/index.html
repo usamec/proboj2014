@@ -153,6 +153,22 @@ rozsahu správy dostanete nulu.
 
 Testovacia mapa zatiaľ podporuje iba dvoch hračov, ktorý majú dvoch panákov. Ale existuje test_map2.m, ktorá je trochu väčšia. 
 
+Funkcie:
+Vid test_player.au.
+Definicia funkcie:
+<pre>
+def fff(a, b, c) {
+  return b + c;
+}
+</pre>
+Vo vnutri funkcie nevidite globalne premenne (vidite len argumenty a premenne, ktore vytvori funkcia).
+
+Funkcia sa vola klasicky:
+<pre>
+xx = fff(2, 3, 4);
+</pre>
+
+
 Pokiaľ si chcete pozrieť hru tak vhodný príkaz je:
 <pre>
 python2 opserver/proboj.py &lt;test.log
