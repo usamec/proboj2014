@@ -11,9 +11,10 @@ parser Proboj:
     token MSG:   "INBOX"
     token AREA:  "(AREA_PL|AREA_BASE|AREA_WALL|AREA_ZUCK|AREA_MARKS)"
     token RAND:  "RAND"
+    token RET: "return"
+    token DEF:   "def"
     token ID:    '[a-zA-Z][a-zA-Z0-9_]*' 
     token END:   "$"
-    token DEF:   "DEF"
  
     rule goal:  {{ g = [] }}
                 (statement {{ g.append(statement) }})*
@@ -26,6 +27,9 @@ parser Proboj:
                     | msgcall";" {{ return msgcall }}
                     | conditional {{ return conditional }}
                     | fdef {{ return fdef }}
+                    | ret {{ return ret }}
+
+    rule ret: RET exprcomp";" {{ return Ret(exprcomp); }}
 
     rule msgcall: MSGCALL"[(]"exprcomp  {{ e = MsgCall(exprcomp) }}
                          (","exprcomp  {{ e.add_arg(exprcomp) }}

@@ -1,4 +1,8 @@
+import sys
+
 keywords = ["RAND", "PUT", "MSG", "AREA"]
+
+functions = set()
 
 class Cond:
   def __init__(self, if_expr, if_block):
@@ -169,5 +173,67 @@ class Exprf:
     self.args.append(expr)
 
   def output(self):
-    raise ValueError()
-    
+    global functions
+    if not isinstance(self.expr, Id):
+      print >>sys.stderr, "zle volanie funkcie"
+      sys.exit(1)
+    name = self.expr.what
+    if name not in functions:
+      print >>sys.stderr, "zle volanie funkcie"
+      sys.exit(1)
+
+    ret_parts = []
+    ret_parts.append("o%s(" % name)
+    ret_parts.append(",".join([x.output() for x in self.args]))
+    ret_parts.append(")")
+    return "".join(ret_parts)
+
+class Fdef:
+  def __init__(self, id):
+    self.name = id
+    self.args = []
+    self.block = None
+
+  def add_arg(self, id):
+    self.args.append(id)
+
+  def add_block(self, block):
+    self.block = block
+
+  def output(self, indent):
+    global functions
+    ret_parts = []
+    ret_parts.append(" "*indent)
+    ret_parts.append("class %s { unordered_map<string, int> data; public: int operator()(" % (self.name))
+    ret_parts.append(",".join(["int "+x for x in self.args]))
+    ret_parts.append(") {\n")
+    for x in self.args:
+      ret_parts.append(" "*(indent+2))    
+      ret_parts.append('data["%s"] = %s;\n' % (x, x))
+
+    for x in functions:
+      ret_parts.append(" "*(indent+2))
+      ret_parts.append('%s o%s;\n' % (x, x))
+    for x in self.block:
+      ret_parts.append(x.output(indent+2))
+      ret_parts.append("\n");
+    ret_parts.append(" "*indent)
+    ret_parts.append("}};\n")
+    ret_parts.append(" "*indent)
+    ret_parts.append("%s o%s;" % (self.name, self.name))
+
+    functions.add(self.name)
+    return "".join(ret_parts)
+
+class Ret:
+  def __init__(self, expr):
+    self.expr = expr
+
+  def output(self, indent):
+    ret_parts = []
+    ret_parts.append(" "*indent)
+    ret_parts.append("return ")
+    ret_parts.append(self.expr.output())
+    ret_parts.append(";");
+    return ''.join(ret_parts)
+
