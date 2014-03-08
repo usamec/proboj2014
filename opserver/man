@@ -1,0 +1,14 @@
+pre spustenie opservera treba 
+./python proboj.py  <<  log.log
+log.log je subor s logom ktorz pogeneroval server.
+
+
+tlacitka na ovladanie:
+q- minus 1 fps
+w- plus 1 fps
+e- minus 10 fps
+r- plus 10 fps
+s- pause, unpause
+h- help (useless) (zatial)
+esc- koniec.
+f- zmena fullscreenu

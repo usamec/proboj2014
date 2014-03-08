@@ -236,6 +236,14 @@ void LogMap(FILE *flog, Game &g) {
     }
     fprintf(flog, "%c", i + 1 == g.g.size() ? ']' : ',');
   }
+  fprintf(flog, ",\"bases\":[", g.g.size(), g.g[0].size());
+  for (int i = 0; i < g.g.size(); i++) {
+    fprintf(flog, "[");
+    for (int j = 0; j < g.g[i].size(); j++) {
+      fprintf(flog, "%d%c", g.g[i][j].base, j + 1 == g.g[i].size() ? ']' : ',');
+    }
+    fprintf(flog, "%c", i + 1 == g.g.size() ? ']' : ',');
+  }
   fprintf(flog, "}");
 }
 

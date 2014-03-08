@@ -29,6 +29,7 @@ state = 0
 dejeSa = []
 velkost = 0
 stav = "running"
+args = sys.argv[1:]
 mypath = os.path.dirname(os.path.abspath(__file__))
 hracc = pygame.image.load(mypath + '/mravec-7.png')
 hracc = pygame.transform.scale(hracc,(15,20))
@@ -44,7 +45,7 @@ def main():
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
     BASICFONT = pygame.font.Font('freesansbold.ttf', 18)
     pygame.display.set_caption('Cukor')
-
+    pygame.display.toggle_fullscreen()
     
     getInput()
     runGame()
@@ -98,7 +99,14 @@ def runGame():
             if event.type == QUIT:
                 terminate()
             elif event.type == KEYDOWN:
-                if (event.key == K_h):
+                
+                
+                if event.key == K_ESCAPE:
+                    terminate()
+                elif '-c' in args:
+                    continue
+                
+                elif (event.key == K_h):
                     print "help"
                     wanaHelp = not wanaHelp
                 
@@ -108,15 +116,21 @@ def runGame():
                     else:
                         stav = "running"
 
-                elif event.key == K_ESCAPE:
-                    terminate()
-                
+                elif event.key == K_f:
+                    pygame.display.toggle_fullscreen()
                 elif event.key == K_q:
                     FPS-=1
                     if FPS <= 1:
                         FPS = 1
                 elif event.key == K_w:
                     FPS += 1
+                
+                elif event.key == K_e:
+                    FPS -= 10
+                    FPS = max(1,FPS)
+                elif event.key == K_r:
+                    FPS += 10
+                    
                     
         DISPLAYSURF.fill(BGCOLOR)
         if stav == "running":
@@ -151,10 +165,12 @@ def gameUpdate():
         
     for c in dejeSa['zucker']:
         cukor[c['y']][c['x']] = c['new_ammount']
-    
-    pprint.pprint(counter)
+    print "cas:",
+    print (counter)
+    print ("dejesa: ")
     pprint.pprint(dejeSa)
-    pprint.pprint(cukor)
+    print ("cukor")
+    print (cukor)
 
 
 def iWanaRect(x, y, size):
@@ -257,7 +273,7 @@ def getColor(coJe, cukor):
     if coJe != 0:
         return BLACK
     else: 
-        return (cukor*20, 200+ cukor*5, cukor*20)
+        return (cukor*25, 200+ cukor*5, cukor*25)
 
 def getPlayerColor(kto):
     """ vrati farbu hraca"""
