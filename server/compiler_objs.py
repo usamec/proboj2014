@@ -159,3 +159,15 @@ class Area:
 
   def output(self):
     return '%s[%d][%d]' % (self.type, self.r, self.c)
+
+class Exprf:
+  def __init__(self, expr):
+    self.expr = expr
+    self.args = []
+
+  def add_arg(self, expr):
+    self.args.append(expr)
+
+  def output(self):
+    raise ValueError()
+    

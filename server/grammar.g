@@ -13,6 +13,7 @@ parser Proboj:
     token RAND:  "RAND"
     token ID:    '[a-zA-Z][a-zA-Z0-9_]*' 
     token END:   "$"
+    token DEF:   "DEF"
  
     rule goal:  {{ g = [] }}
                 (statement {{ g.append(statement) }})*
@@ -24,15 +25,24 @@ parser Proboj:
                     | call";" {{ return call }}
                     | msgcall";" {{ return msgcall }}
                     | conditional {{ return conditional }}
+                    | fdef {{ return fdef }}
 
     rule msgcall: MSGCALL"[(]"exprcomp  {{ e = MsgCall(exprcomp) }}
                          (","exprcomp  {{ e.add_arg(exprcomp) }}
                          )*
                         "[)]"   {{ return e }}
 
+    rule fdef: DEF ID"[(]" {{ e = Fdef(ID) }}
+               (ID {{ e.add_arg(ID) }}
+               (","ID  {{ e.add_arg(ID) }}
+               )*)?
+               "[)]" block {{ e.add_block(block) }}
+               {{ return e }}
+                
+
     rule conditional: IF"[(]" exprcomp "[)]" block {{ i = Cond(exprcomp, block) }}
                       (ELIF"[(]" exprcomp "[)]" block {{ i.add_elif(exprcomp, block) }})*
-                      (ELSE block)? {{i.add_else(block) }}
+                      (ELSE block {{i.add_else(block) }} )?
                       {{ return i }}
 
     rule block: "{" {{ g = [] }} (statement {{ g.append(statement) }})*
@@ -71,8 +81,16 @@ parser Proboj:
                 | "%" expr2  {{ e.add_op("%", expr2) }}
                 )*  {{ return e }}
                 
-    rule expr2: exprel {{ return exprel }}
-                | "!"exprel {{ return Neg(exprel) }}
+    rule expr2: exprf {{ return exprf  }}
+                | "!"exprf {{ return Neg(exprf) }}
+
+    rule exprf: exprel {{ e = exprel }}
+                ("[(]"  {{ e = Exprf(exprel) }}
+                (exprcomp {{ e.add_arg(exprcomp) }}
+                (","exprcomp  {{ e.add_arg(exprcomp) }}
+                )*)?
+                "[)]")?   {{ return e }}
+
 
     rule exprel: NUM {{ return Num(int(NUM)) }} |
                 "[(]"exprcomp"[)]" {{ return exprcomp }} |

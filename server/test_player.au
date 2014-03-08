@@ -4,6 +4,4 @@ if (!(AREA_PL[1,0] > 0)) {
   GRAB(); 
 } elif (AREA_BASE[0,0] == PL_ID && CARRY > 0) {
   PUT();
-} else {
-  MOVE(RAND % 3 - 1, RAND % 3 - 1);
-}
+} 

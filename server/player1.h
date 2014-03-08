@@ -11,8 +11,6 @@ class Player1 : public Unit {
       GRAB();
     } else if (((AREA_BASE[0][0]==data["PL_ID"])&&(data["CARRY"]>0))) {
       PUT();
-    } else {
-      MOVE(((rand()%3)-1),((rand()%3)-1));
     }
 
   }
