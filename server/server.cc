@@ -7,6 +7,8 @@
 #include <ctime>
 
 vector<int> scores;
+int tick = 0;
+int max_tick = 5000;
 
 void GetEmptyPos(Game &g, int team, int &y, int &x) {
   for (int i = 0; i < g.g.size(); i++) {
@@ -95,6 +97,8 @@ void Unit::Step() {
   data["MAX_ID"] = g->units_per_team;
   data["MAX_PLAYER"] = n_players;
   data["CARRY"] = carry;
+  data["TICK"] = tick;
+  data["MAX_TICK"] = max_tick;
   act = false;
   AREA_PL.clear();
   AREA_BASE.clear();
@@ -251,9 +255,10 @@ int main(int argc, char** argv) {
   }
 
   fprintf(flog, ", \"steps\": [");
-  int n_steps = 5000;
+  int n_steps = max_tick;
   int n_zucker = 10;
   for (int st = 0; st < n_steps; st++) {
+    tick = st + 1;
     vector<pair<int, int>> zucker_change;
     // TODO: randomize steps
     for (int z = 0; z < n_zucker; z++) {
