@@ -1,6 +1,7 @@
 import os
 import datetime
 import random
+import sys
 
 n_players = 4
 cur_scores = [0 for x in xrange(n_players)]
@@ -15,7 +16,9 @@ for x in xrange(n_players):
   cmd += "../players/%d.au " % x
 
 print cmd
-os.system(cmd)
+if not os.system(cmd) == 0:
+  print "compile failed"
+  sys.exit(1)
 
 filename = datetime.datetime.now().strftime("../logs/%Y_%m_%d_%H_%M_%S.log")
 

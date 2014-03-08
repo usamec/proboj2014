@@ -282,9 +282,10 @@ def drawScore():
     scoreRect = scoreSurf.get_rect()
     scoreRect.topright = (WINDOWWIDTH - 20, 20)
     DISPLAYSURF.blit(scoreSurf, scoreRect)
+    names = ["Japonsko", "Mexiko", "Rusko", "Taliansko"]
         
     for i,s in enumerate (dejeSa['scores']):
-        scoreSurf = BASICFONT.render('player '+ str(i+1)+ ': ' + str(dejeSa['scores'][i]), True, getPlayerColor(i)) #funky options
+        scoreSurf = BASICFONT.render(names[i]+ ': ' + str(dejeSa['scores'][i]), True, getPlayerColor(i)) #funky options
         scoreRect = scoreSurf.get_rect()
         scoreRect.topright = (WINDOWWIDTH - 20, 20*(i+2))
         DISPLAYSURF.blit(scoreSurf, scoreRect)

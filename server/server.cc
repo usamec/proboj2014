@@ -11,6 +11,7 @@ int tick = 0;
 int max_tick = 5000;
 
 void GetEmptyPos(Game &g, int team, int &y, int &x) {
+  vector<pair<int, int>> cands;
   for (int i = 0; i < g.g.size(); i++) {
     for (int j = 0; j < g.g[i].size(); j++) {
       if (g.g[i][j].base == team) {
@@ -22,14 +23,15 @@ void GetEmptyPos(Game &g, int team, int &y, int &x) {
           }
         }
         if (!occ) {
-          y = i;
-          x = j;
-          return;
+          cands.push_back(make_pair(i,j));
         }
       }
     }
   }
-  assert(false);
+  assert(!cands.empty());
+  int rc = rand()%cands.size();
+  y = cands[rc].first;
+  x = cands[rc].second;
 }
 
 Game LoadGame(char* fn) {
@@ -257,6 +259,12 @@ int main(int argc, char** argv) {
   fprintf(flog, ", \"steps\": [");
   int n_steps = max_tick;
   int n_zucker = 10;
+  vector<int> sts;
+  for (int i = 0; i < n_steps; i++) {
+    sts.push_back(i%g.units.size());
+  }
+  random_shuffle(sts.begin(), sts.end());
+
   for (int st = 0; st < n_steps; st++) {
     tick = st + 1;
     vector<pair<int, int>> zucker_change;
@@ -273,7 +281,7 @@ int main(int argc, char** argv) {
         }
       }
     }
-    g.units[st%g.units.size()]->Step();
+    g.units[sts[st]]->Step();
 
     for (int i = 0; i < g.units.size(); i++) {
       printf("(%d, %d) ", g.units[i]->x, g.units[i]->y);

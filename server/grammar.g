@@ -56,7 +56,8 @@ parser Proboj:
                    | "<" expr0  {{ e.add_op("<", expr0) }}
                    | ">" expr0  {{ e.add_op(">", expr0) }}
                    | ">=" expr0  {{ e.add_op(">=", expr0) }}
-                   )*  {{ return e }}
+                   | "!=" expr0  {{ e.add_op("!=", expr0) }})* 
+		    {{ return e }}
 
 
     rule expr0: expr1          {{ e = Expr(expr1) }}

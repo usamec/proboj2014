@@ -13,6 +13,7 @@ class ProbojScanner(runtime.Scanner):
         ('"[*]"', re.compile('[*]')),
         ('"-"', re.compile('-')),
         ('"[+]"', re.compile('[+]')),
+        ('"!="', re.compile('!=')),
         ('">="', re.compile('>=')),
         ('">"', re.compile('>')),
         ('"<"', re.compile('<')),
@@ -159,8 +160,8 @@ class Proboj(runtime.Parser):
         _context = self.Context(_parent, self._scanner, 'expr00', [])
         expr0 = self.expr0(_context)
         e = Expr(expr0)
-        while self._peek('"=="', '"<="', '"<"', '">"', '">="', '"&&"', '"||"', '"[)]"', '","', '";"', context=_context) in ['"=="', '"<="', '"<"', '">"', '">="']:
-            _token = self._peek('"=="', '"<="', '"<"', '">"', '">="', context=_context)
+        while self._peek('"=="', '"<="', '"<"', '">"', '">="', '"!="', '"&&"', '"||"', '"[)]"', '","', '";"', context=_context) not in ['"&&"', '"||"', '"[)]"', '","', '";"']:
+            _token = self._peek('"=="', '"<="', '"<"', '">"', '">="', '"!="', context=_context)
             if _token == '"=="':
                 self._scan('"=="', context=_context)
                 expr0 = self.expr0(_context)
@@ -177,17 +178,21 @@ class Proboj(runtime.Parser):
                 self._scan('">"', context=_context)
                 expr0 = self.expr0(_context)
                 e.add_op(">", expr0)
-            else: # == '">="'
+            elif _token == '">="':
                 self._scan('">="', context=_context)
                 expr0 = self.expr0(_context)
                 e.add_op(">=", expr0)
+            else: # == '"!="'
+                self._scan('"!="', context=_context)
+                expr0 = self.expr0(_context)
+                e.add_op("!=", expr0)
         return e
 
     def expr0(self, _parent=None):
         _context = self.Context(_parent, self._scanner, 'expr0', [])
         expr1 = self.expr1(_context)
         e = Expr(expr1)
-        while self._peek('"[+]"', '"-"', '"[)]"', '"=="', '"<="', '"<"', '">"', '">="', '"&&"', '"||"', '","', '";"', context=_context) in ['"[+]"', '"-"']:
+        while self._peek('"[+]"', '"-"', '"[)]"', '"=="', '"<="', '"<"', '">"', '">="', '"!="', '"&&"', '"||"', '","', '";"', context=_context) in ['"[+]"', '"-"']:
             _token = self._peek('"[+]"', '"-"', context=_context)
             if _token == '"[+]"':
                 self._scan('"[+]"', context=_context)
@@ -203,7 +208,7 @@ class Proboj(runtime.Parser):
         _context = self.Context(_parent, self._scanner, 'expr1', [])
         expr2 = self.expr2(_context)
         e = Expr(expr2)
-        while self._peek('"[*]"', '"/"', '"%"', '"[+]"', '"-"', '"[)]"', '"=="', '"<="', '"<"', '">"', '">="', '"&&"', '"||"', '","', '";"', context=_context) in ['"[*]"', '"/"', '"%"']:
+        while self._peek('"[*]"', '"/"', '"%"', '"[+]"', '"-"', '"[)]"', '"=="', '"<="', '"<"', '">"', '">="', '"!="', '"&&"', '"||"', '","', '";"', context=_context) in ['"[*]"', '"/"', '"%"']:
             _token = self._peek('"[*]"', '"/"', '"%"', context=_context)
             if _token == '"[*]"':
                 self._scan('"[*]"', context=_context)
