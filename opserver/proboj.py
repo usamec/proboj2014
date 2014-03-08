@@ -6,6 +6,7 @@ import json
 import pprint
 import numpy as np
 from pygame.locals import *
+import os
 
 FPS = 2
 WINDOWWIDTH = 1000
@@ -28,7 +29,8 @@ state = 0
 dejeSa = []
 velkost = 0
 stav = "running"
-hracc = pygame.image.load('opserver/mravec-7.png')
+mypath = os.path.dirname(os.path.abspath(__file__))
+hracc = pygame.image.load(mypath + '/mravec-7.png')
 hracc = pygame.transform.scale(hracc,(15,20))
 marginTop, marginLeft = 20, 20
 counter = 0
@@ -80,11 +82,11 @@ def runGame():
     
     print "Game is running"
     print "mapa"
-    pprint.pprint (mapa)
+    #pprint.pprint (mapa)
     print "kroky"
-    pprint.pprint (steps)
+    #pprint.pprint (steps)
     print "cukor"
-    pprint.pprint (cukor)
+    #pprint.pprint (cukor)
     
     
     wanaHelp = False
