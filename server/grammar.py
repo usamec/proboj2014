@@ -20,7 +20,7 @@ class ProbojScanner(runtime.Scanner):
         ('"<"', re.compile('<')),
         ('"<="', re.compile('<=')),
         ('"=="', re.compile('==')),
-        ('"||"', re.compile('||')),
+        ('"\\|\\|"', re.compile('\\|\\|')),
         ('"&&"', re.compile('&&')),
         ('"="', re.compile('=')),
         ('"}"', re.compile('}')),
@@ -178,14 +178,14 @@ class Proboj(runtime.Parser):
         _context = self.Context(_parent, self._scanner, 'exprcomp', [])
         expr00 = self.expr00(_context)
         e = Expr(expr00)
-        while self._peek('"&&"', '"||"', '";"', '"[)]"', '","', context=_context) in ['"&&"', '"||"']:
-            _token = self._peek('"&&"', '"||"', context=_context)
+        while self._peek('"&&"', '"\\|\\|"', '";"', '"[)]"', '","', context=_context) in ['"&&"', '"\\|\\|"']:
+            _token = self._peek('"&&"', '"\\|\\|"', context=_context)
             if _token == '"&&"':
                 self._scan('"&&"', context=_context)
                 expr00 = self.expr00(_context)
                 e.add_op("&&", expr00)
-            else: # == '"||"'
-                self._scan('"||"', context=_context)
+            else: # == '"\\|\\|"'
+                self._scan('"\\|\\|"', context=_context)
                 expr00 = self.expr00(_context)
                 e.add_op("||", expr00)
         return e
@@ -194,7 +194,7 @@ class Proboj(runtime.Parser):
         _context = self.Context(_parent, self._scanner, 'expr00', [])
         expr0 = self.expr0(_context)
         e = Expr(expr0)
-        while self._peek('"=="', '"<="', '"<"', '">"', '">="', '"!="', '"&&"', '"||"', '";"', '"[)]"', '","', context=_context) not in ['"&&"', '"||"', '";"', '"[)]"', '","']:
+        while self._peek('"=="', '"<="', '"<"', '">"', '">="', '"!="', '"&&"', '"\\|\\|"', '";"', '"[)]"', '","', context=_context) not in ['"&&"', '"\\|\\|"', '";"', '"[)]"', '","']:
             _token = self._peek('"=="', '"<="', '"<"', '">"', '">="', '"!="', context=_context)
             if _token == '"=="':
                 self._scan('"=="', context=_context)
@@ -226,7 +226,7 @@ class Proboj(runtime.Parser):
         _context = self.Context(_parent, self._scanner, 'expr0', [])
         expr1 = self.expr1(_context)
         e = Expr(expr1)
-        while self._peek('"[+]"', '"-"', '"=="', '"<="', '"<"', '">"', '">="', '"!="', '"&&"', '"||"', '";"', '"[)]"', '","', context=_context) in ['"[+]"', '"-"']:
+        while self._peek('"[+]"', '"-"', '"=="', '"<="', '"<"', '">"', '">="', '"!="', '"&&"', '"\\|\\|"', '";"', '"[)]"', '","', context=_context) in ['"[+]"', '"-"']:
             _token = self._peek('"[+]"', '"-"', context=_context)
             if _token == '"[+]"':
                 self._scan('"[+]"', context=_context)
@@ -242,7 +242,7 @@ class Proboj(runtime.Parser):
         _context = self.Context(_parent, self._scanner, 'expr1', [])
         expr2 = self.expr2(_context)
         e = Expr(expr2)
-        while self._peek('"[*]"', '"/"', '"%"', '"[+]"', '"-"', '"=="', '"<="', '"<"', '">"', '">="', '"!="', '"&&"', '"||"', '";"', '"[)]"', '","', context=_context) in ['"[*]"', '"/"', '"%"']:
+        while self._peek('"[*]"', '"/"', '"%"', '"[+]"', '"-"', '"=="', '"<="', '"<"', '">"', '">="', '"!="', '"&&"', '"\\|\\|"', '";"', '"[)]"', '","', context=_context) in ['"[*]"', '"/"', '"%"']:
             _token = self._peek('"[*]"', '"/"', '"%"', context=_context)
             if _token == '"[*]"':
                 self._scan('"[*]"', context=_context)
@@ -273,7 +273,7 @@ class Proboj(runtime.Parser):
         _context = self.Context(_parent, self._scanner, 'exprf', [])
         exprel = self.exprel(_context)
         e = exprel
-        if self._peek('"[(]"', '"[*]"', '"/"', '"%"', '"[+]"', '"-"', '"=="', '"<="', '"<"', '">"', '">="', '"!="', '"&&"', '"||"', '";"', '"[)]"', '","', context=_context) == '"[(]"':
+        if self._peek('"[(]"', '"[*]"', '"/"', '"%"', '"[+]"', '"-"', '"=="', '"<="', '"<"', '">"', '">="', '"!="', '"&&"', '"\\|\\|"', '";"', '"[)]"', '","', context=_context) == '"[(]"':
             self._scan('"[(]"', context=_context)
             e = Exprf(exprel)
             if self._peek('"[)]"', '","', '"!"', 'NUM', '"[(]"', 'ID', 'MSG', 'AREA', 'RAND', context=_context) not in ['"[)]"', '","']:

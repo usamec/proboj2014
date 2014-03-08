@@ -278,7 +278,7 @@ def getColor(coJe, cukor):
 def getPlayerColor(kto):
     """ vrati farbu hraca"""
     if kto == 1:
-        return ( 255, 255, 0) #slniecko
+        return ( 160, 84, 47) #slniecko
     if kto == 2:
         return (0, 0, 200) # more
     if kto == 3:

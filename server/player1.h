@@ -16,10 +16,9 @@ class Player1 : public Unit {
     }};
     min omin;
     data["c"]=omin(4,7);
-    printf("c %d\n", data["c"]);
     if (!(AREA_PL[1][0]>0)) {
       ATTACK(1,0);
-    } else if (((AREA_ZUCK[0][0]>0)&&(data["CARRY"]<10))) {
+    } else if (((AREA_ZUCK[0][0]>0)||(data["CARRY"]<10))) {
       GRAB();
     } else if (((AREA_BASE[0][0]==data["PL_ID"])&&(data["CARRY"]>0))) {
       PUT();

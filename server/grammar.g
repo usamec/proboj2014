@@ -61,7 +61,7 @@ parser Proboj:
 
     rule exprcomp: expr00          {{ e = Expr(expr00) }}
                 ( "&&" expr00  {{ e.add_op("&&", expr00) }}
-                | "||" expr00  {{ e.add_op("||", expr00) }}
+                | "\|\|" expr00  {{ e.add_op("||", expr00) }}
                 )*  {{ return e }}
    
     rule expr00:   expr0 {{ e = Expr(expr0) }}
