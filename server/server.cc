@@ -35,6 +35,11 @@ Game LoadGame(char* fn) {
   Game g;
   int r, c;
   scores.resize(n_players);
+  vector<int> base_perm(n_players);
+  for (int i = 0; i < base_perm.size(); i++) {
+    base_perm[i] = i;
+  }
+  random_shuffle(base_perm.begin(), base_perm.end());
   fscanf(f, "%d %d %d", &r, &c, &g.units_per_team);
   g.g.resize(r, vector<Point>(c));
   for (int i = 0; i < r; i++) {
@@ -43,7 +48,7 @@ Game LoadGame(char* fn) {
       if (x < 0) {
         g.g[i][j].wall = true;
       } else if (x >= 1) {
-        g.g[i][j].base = (int)(x);
+        g.g[i][j].base = base_perm[(int)(x)-1]+1;
       }
       else g.g[i][j].zucker_prob = x;
       g.g[i][j].marks.resize(n_players);
