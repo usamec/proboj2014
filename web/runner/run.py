@@ -2,7 +2,7 @@ import os
 import datetime
 import random
 
-n_players = 1
+n_players = 4
 cur_scores = [0 for x in xrange(n_players)]
 if os.path.exists("../logs/scores.txt"):
   f = open("../logs/scores.txt")

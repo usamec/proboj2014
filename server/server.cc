@@ -93,6 +93,7 @@ void Unit::Step() {
   data["PL_ID"] = player_id;
   data["ID"] = id;
   data["MAX_ID"] = g->units_per_team;
+  data["MAX_PLAYER"] = n_players;
   data["CARRY"] = carry;
   act = false;
   AREA_PL.clear();

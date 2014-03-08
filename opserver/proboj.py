@@ -8,7 +8,7 @@ import numpy as np
 from pygame.locals import *
 import os
 
-FPS = 2
+FPS = 10
 WINDOWWIDTH = 1000
 WINDOWHEIGHT = 700
 

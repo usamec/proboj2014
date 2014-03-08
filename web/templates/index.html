@@ -97,6 +97,7 @@ if (...) {
 }
 </pre>
 Časti elif môže byť aj viac. Else je nepovinný. Ale else if neexistuje.
+A brčkaté zátvorky sú povinné.
 
 Existuje niekoľko špeciálnych premenných, ktoré sa na začiatku ťahu naplnia (vy si ich môžete
 prepísať čím chcete, ale neodporúča sa):
@@ -105,7 +106,9 @@ prepísať čím chcete, ale neodporúča sa):
 <li>ID - id panáka (čísluje sa od 1)</li>
 <li>Y, X - súradnice, číslované od 0</li>
 <li>R, C - rozmery mapy</li>
-<li>CARRY - váš aktuálny náklad</li>
+<li>CARRY - váš aktuálny náklad, maximálna nosnosť je 10</li>
+<li>MAX_ID - maximalne ID vasho panaka</li>
+<li>MAX_PLAYER - maximalne ID hraca</li>
 </ul>
 
 Pokiaľ chcete náhodné číslo použite token RAND, napr.:
