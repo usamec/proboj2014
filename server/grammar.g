@@ -71,9 +71,11 @@ parser Proboj:
                 | "%" expr2  {{ e.add_op("%", expr2) }}
                 )*  {{ return e }}
                 
-  
-    rule expr2: NUM {{ return Num(int(NUM)) }} |
-                "[(]"expr0"[)]" {{ return expr0 }} |
+    rule expr2: exprel {{ return exprel }}
+                | "!"exprel {{ return Neg(exprel) }}
+
+    rule exprel: NUM {{ return Num(int(NUM)) }} |
+                "[(]"exprcomp"[)]" {{ return exprcomp }} |
                 ID {{ return Id(ID) }} |
                 MSG"\\["NUM"\\]" {{ return Msg(int(NUM)) }} | 
                 AREA"\\["NUM {{ num1 = int(NUM) }} ","NUM"\\]" {{ return Area(AREA, num1, int(NUM)) }} | 

@@ -128,6 +128,13 @@ class Rand:
   def output(self):
     return "rand()"
 
+class Neg:
+  def __init__(self, expr):
+    self.expr = expr
+
+  def output(self):
+    return "!" + self.expr.output()
+
 class Id:
   def __init__(self, what):
     self.what = what
