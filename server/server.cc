@@ -10,7 +10,7 @@ vector<int> scores;
 int tick = 0;
 int max_tick = 5000;
 
-void GetEmptyPos(Game &g, int team, int &y, int &x) {
+bool GetEmptyPos(Game &g, int team, int &y, int &x) {
   vector<pair<int, int>> cands;
   for (int i = 0; i < g.g.size(); i++) {
     for (int j = 0; j < g.g[i].size(); j++) {
@@ -28,10 +28,11 @@ void GetEmptyPos(Game &g, int team, int &y, int &x) {
       }
     }
   }
-  assert(!cands.empty());
+  if (cands.empty()) return false;
   int rc = rand()%cands.size();
   y = cands[rc].first;
   x = cands[rc].second;
+  return true;
 }
 
 Game LoadGame(char* fn) {
@@ -61,7 +62,7 @@ Game LoadGame(char* fn) {
   for (int i = 0; i < n_players; i++) {
     for (int j = 0; j < g.units_per_team; j++) {
       int x, y;
-      GetEmptyPos(g, i+1, y, x);
+      assert(GetEmptyPos(g, i+1, y, x));
       Unit* u = CreatePlayerUnit(i+1);
       u->y = y;
       u->x = x;
@@ -152,15 +153,26 @@ void Unit::ATTACK(int yy, int xx) {
         g->units[i]->inbox.clear();
         g->units[i]->carry = 0;
         int nx, ny;
+        int ox = g->units[i]->x;
+        int oy = g->units[i]->y;
         g->units[i]->x = -1;
         g->units[i]->y = -1;
-        GetEmptyPos(*g, g->units[i]->player_id, ny, nx);
-        g->units[i]->y = ny;
-        g->units[i]->x = nx;
-        g->cur_attacks.push_back(Attack(make_pair(player_id, id),
-                                        make_pair(g->units[i]->player_id,
-                                                  g->units[i]->id),
-                                        true));
+        if (GetEmptyPos(*g, g->units[i]->player_id, ny, nx)) {
+          g->units[i]->y = ny;
+          g->units[i]->x = nx;
+          g->cur_attacks.push_back(Attack(make_pair(player_id, id),
+                                          make_pair(g->units[i]->player_id,
+                                                    g->units[i]->id),
+                                          true));
+        } else {
+          printf("base full\n");
+          g->units[i]->x = ox;
+          g->units[i]->y = oy;
+          g->cur_attacks.push_back(Attack(make_pair(player_id, id),
+                                          make_pair(g->units[i]->player_id,
+                                                    g->units[i]->id),
+                                          false));
+        }
       } else {
         g->cur_attacks.push_back(Attack(make_pair(player_id, id),
                                         make_pair(g->units[i]->player_id,

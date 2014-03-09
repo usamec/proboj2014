@@ -8,10 +8,12 @@ def min(a, b) {
 
 c = min(4,7);
 
-if (!(AREA_PL[1,0] > 0)) {
+if (AREA_PL[1,0] > 0) {
   ATTACK(1, 0);
-} elif (AREA_ZUCK[0,0] > 0 || CARRY < 10) {
+} elif (AREA_ZUCK[0,0] > 0 && CARRY < 10) {
   GRAB(); 
 } elif (AREA_BASE[0,0] == PL_ID && CARRY > 0) {
   PUT();
-} 
+} else {
+  MOVE(RAND % 3 - 1, RAND % 3 - 1);
+}
