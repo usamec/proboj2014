@@ -169,9 +169,7 @@ def gameUpdate():
     print (counter)
     print ("dejesa: ")
     pprint.pprint(dejeSa)
-    print ("cukor")
-    print (cukor)
-
+    
 
 def iWanaRect(x, y, size):
     global mapa, velkost
@@ -195,6 +193,10 @@ def drawMap():
         for j in range(mapa['c']):
             policko = iWanaRect(j,i,0)
             pygame.draw.rect(DISPLAYSURF, getColor(mapa['data'][i][j],cukor[i][j]) , policko)
+            if mapa['bases'][i][j]>0 and mapa['bases'][i][j]<6:
+                policko = iWanaRect(j,i,0-1)
+                pygame.draw.rect(DISPLAYSURF,  getPlayerColor(mapa['bases'][i][j]) , policko)
+            
     pass
 
 def drawPlayers():
