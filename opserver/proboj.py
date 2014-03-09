@@ -195,7 +195,7 @@ def drawMap():
             pygame.draw.rect(DISPLAYSURF, getColor(mapa['data'][i][j],cukor[i][j]) , policko)
             if mapa['bases'][i][j]>0 and mapa['bases'][i][j]<6:
                 policko = iWanaRect(j,i,0-1)
-                pygame.draw.rect(DISPLAYSURF,  getPlayerColor(mapa['bases'][i][j]) , policko)
+                pygame.draw.rect(DISPLAYSURF,  getBaseColor(mapa['bases'][i][j]-1) , policko)
             
     pass
 
@@ -277,21 +277,33 @@ def getColor(coJe, cukor):
     else: 
         return (cukor*25, 200+ cukor*5, cukor*25)
 
+def bright(color,x):
+    return tuple(max(0,min(255,x+q) ) for q in color)
+    
+
+
 def getPlayerColor(kto):
     """ vrati farbu hraca"""
     if kto == 1:
         return ( 160, 84, 47) #slniecko
-    if kto == 2:
+    elif kto == 2:
         return (0, 0, 200) # more
-    if kto == 3:
+    elif kto == 3:
         return (200, 0, 200)
-    if kto == 4:
+    elif kto == 4:
         return (255, 128 , 0)
-    if kto == 5:
+    elif kto == 5:
         return (0, 0, 0)
-    if kto == 0:
+    elif kto == 0:
         return (255,100,100)
-        
+    else: return (50,50,50)    
+
+def getBaseColor(kto):
+    """ vrati farbu hraca"""
+    const = 60
+    pom = getPlayerColor(kto)
+    
+    return bright(pom,const)
 
 def drawScore():
     global dejeSa, FPS
