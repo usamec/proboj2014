@@ -16,6 +16,7 @@ class Player1 : public Unit {
     }};
     min omin;
     data["c"]=omin(4,7);
+    data["d"]=AREA_PL[data["c"]][data["c"]];
     if ((AREA_PL[1][0]>0)) {
       ATTACK(1,0);
     } else if (((AREA_ZUCK[0][0]>0)&&(data["CARRY"]<10))) {

@@ -153,7 +153,7 @@ class Msg:
     self.index = index
 
   def output(self):
-    return 'inbox[%d]' % self.index
+    return 'inbox[%s]' % self.index.output()
 
 class Area:
   def __init__(self, type, r, c):
@@ -162,7 +162,7 @@ class Area:
     self.c = c
 
   def output(self):
-    return '%s[%d][%d]' % (self.type, self.r, self.c)
+    return '%s[%s][%s]' % (self.type, self.r.output(), self.c.output())
 
 class Exprf:
   def __init__(self, expr):

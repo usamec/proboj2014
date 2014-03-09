@@ -178,7 +178,7 @@ class Proboj(runtime.Parser):
         _context = self.Context(_parent, self._scanner, 'exprcomp', [])
         expr00 = self.expr00(_context)
         e = Expr(expr00)
-        while self._peek('"&&"', '"\\|\\|"', '";"', '"[)]"', '","', context=_context) in ['"&&"', '"\\|\\|"']:
+        while self._peek('"&&"', '"\\|\\|"', '";"', '"[)]"', '"\\\\]"', '","', context=_context) in ['"&&"', '"\\|\\|"']:
             _token = self._peek('"&&"', '"\\|\\|"', context=_context)
             if _token == '"&&"':
                 self._scan('"&&"', context=_context)
@@ -194,7 +194,7 @@ class Proboj(runtime.Parser):
         _context = self.Context(_parent, self._scanner, 'expr00', [])
         expr0 = self.expr0(_context)
         e = Expr(expr0)
-        while self._peek('"=="', '"<="', '"<"', '">"', '">="', '"!="', '"&&"', '"\\|\\|"', '";"', '"[)]"', '","', context=_context) not in ['"&&"', '"\\|\\|"', '";"', '"[)]"', '","']:
+        while self._peek('"=="', '"<="', '"<"', '">"', '">="', '"!="', '"&&"', '"\\|\\|"', '";"', '"[)]"', '"\\\\]"', '","', context=_context) in ['"=="', '"<="', '"<"', '">"', '">="', '"!="']:
             _token = self._peek('"=="', '"<="', '"<"', '">"', '">="', '"!="', context=_context)
             if _token == '"=="':
                 self._scan('"=="', context=_context)
@@ -226,7 +226,7 @@ class Proboj(runtime.Parser):
         _context = self.Context(_parent, self._scanner, 'expr0', [])
         expr1 = self.expr1(_context)
         e = Expr(expr1)
-        while self._peek('"[+]"', '"-"', '"=="', '"<="', '"<"', '">"', '">="', '"!="', '"&&"', '"\\|\\|"', '";"', '"[)]"', '","', context=_context) in ['"[+]"', '"-"']:
+        while self._peek('"[+]"', '"-"', '"=="', '"<="', '"<"', '">"', '">="', '"!="', '"&&"', '"\\|\\|"', '";"', '"[)]"', '"\\\\]"', '","', context=_context) in ['"[+]"', '"-"']:
             _token = self._peek('"[+]"', '"-"', context=_context)
             if _token == '"[+]"':
                 self._scan('"[+]"', context=_context)
@@ -242,7 +242,7 @@ class Proboj(runtime.Parser):
         _context = self.Context(_parent, self._scanner, 'expr1', [])
         expr2 = self.expr2(_context)
         e = Expr(expr2)
-        while self._peek('"[*]"', '"/"', '"%"', '"[+]"', '"-"', '"=="', '"<="', '"<"', '">"', '">="', '"!="', '"&&"', '"\\|\\|"', '";"', '"[)]"', '","', context=_context) in ['"[*]"', '"/"', '"%"']:
+        while self._peek('"[*]"', '"/"', '"%"', '"[+]"', '"-"', '"=="', '"<="', '"<"', '">"', '">="', '"!="', '"&&"', '"\\|\\|"', '";"', '"[)]"', '"\\\\]"', '","', context=_context) in ['"[*]"', '"/"', '"%"']:
             _token = self._peek('"[*]"', '"/"', '"%"', context=_context)
             if _token == '"[*]"':
                 self._scan('"[*]"', context=_context)
@@ -273,7 +273,7 @@ class Proboj(runtime.Parser):
         _context = self.Context(_parent, self._scanner, 'exprf', [])
         exprel = self.exprel(_context)
         e = exprel
-        if self._peek('"[(]"', '"[*]"', '"/"', '"%"', '"[+]"', '"-"', '"=="', '"<="', '"<"', '">"', '">="', '"!="', '"&&"', '"\\|\\|"', '";"', '"[)]"', '","', context=_context) == '"[(]"':
+        if self._peek('"[(]"', '"[*]"', '"/"', '"%"', '"[+]"', '"-"', '"=="', '"<="', '"<"', '">"', '">="', '"!="', '"&&"', '"\\|\\|"', '";"', '"[)]"', '"\\\\]"', '","', context=_context) == '"[(]"':
             self._scan('"[(]"', context=_context)
             e = Exprf(exprel)
             if self._peek('"[)]"', '","', '"!"', 'NUM', '"[(]"', 'ID', 'MSG', 'AREA', 'RAND', context=_context) not in ['"[)]"', '","']:
@@ -303,18 +303,18 @@ class Proboj(runtime.Parser):
         elif _token == 'MSG':
             MSG = self._scan('MSG', context=_context)
             self._scan('"\\\\["', context=_context)
-            NUM = self._scan('NUM', context=_context)
+            exprcomp = self.exprcomp(_context)
             self._scan('"\\\\]"', context=_context)
-            return Msg(int(NUM))
+            return Msg(exprcomp)
         elif _token == 'AREA':
             AREA = self._scan('AREA', context=_context)
             self._scan('"\\\\["', context=_context)
-            NUM = self._scan('NUM', context=_context)
-            num1 = int(NUM)
+            exprcomp = self.exprcomp(_context)
+            num1 = exprcomp
             self._scan('","', context=_context)
-            NUM = self._scan('NUM', context=_context)
+            exprcomp = self.exprcomp(_context)
             self._scan('"\\\\]"', context=_context)
-            return Area(AREA, num1, int(NUM))
+            return Area(AREA, num1, exprcomp)
         else: # == 'RAND'
             RAND = self._scan('RAND', context=_context)
             return Rand()

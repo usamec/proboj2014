@@ -99,7 +99,7 @@ parser Proboj:
     rule exprel: NUM {{ return Num(int(NUM)) }} |
                 "[(]"exprcomp"[)]" {{ return exprcomp }} |
                 ID {{ return Id(ID) }} |
-                MSG"\\["NUM"\\]" {{ return Msg(int(NUM)) }} | 
-                AREA"\\["NUM {{ num1 = int(NUM) }} ","NUM"\\]" {{ return Area(AREA, num1, int(NUM)) }} | 
+                MSG"\\["exprcomp"\\]" {{ return Msg(exprcomp) }} | 
+                AREA"\\["exprcomp {{ num1 = exprcomp }} ","exprcomp"\\]" {{ return Area(AREA, num1, exprcomp) }} | 
                 RAND {{ return Rand() }}
                 
