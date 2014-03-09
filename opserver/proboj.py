@@ -204,11 +204,21 @@ def drawPlayers():
     global dejeSa, velkost
     
     for i, player in enumerate (dejeSa['units']):
+        
         for minion in player:
             
             char = iWanaRect(minion['x'],minion['y'],2)
             pygame.draw.rect(DISPLAYSURF, getPlayerColor(i) , char)
             #DISPLAYSURF.blit(hracc, iWanaPoz(minion['x'],minion['y'], 20,30))
+            
+            
+            cukerBar = iWanaRect(minion['x'],minion['y'],0)
+            cukerBar.height = 3
+            cukerBar.width = minion['carry']*3
+            cukerBar.center = char.center
+            cukerBar.bottom = char.top+2
+            
+            pygame.draw.rect(DISPLAYSURF, WHITE , cukerBar)
             
     pass
     
