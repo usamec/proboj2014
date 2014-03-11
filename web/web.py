@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from flask import request, redirect, session, url_for
-from flask import flash
+from flask import flash, send_file
 from werkzeug.utils import secure_filename
 import os
 import subprocess
@@ -84,6 +84,14 @@ def get_last_games():
     last_games.append({"name": log, "scores": scores})
 
   return last_games
+
+@app.route('/downgame/<game>')
+def downgame(game):
+  if os.path.exists("logs/%s.log" % game):
+    return send_file("logs/%s.log" % game, as_attachment=True,
+                     attachment_filename="%s.log" % game) 
+  else:
+    return "ty si chudak!"
 
 @app.route('/')
 def main():

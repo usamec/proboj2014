@@ -8,7 +8,7 @@
 
 vector<int> scores;
 int tick = 0;
-int max_tick = 5000;
+int max_tick = 25000;
 
 bool GetEmptyPos(Game &g, int team, int &y, int &x) {
   vector<pair<int, int>> cands;
@@ -114,7 +114,10 @@ void Unit::Step() {
       if (abs(i) + abs(j) > sur) continue;
       int ry = y + i;
       int rx = x + j;
-      if (ry < 0 || rx < 0 || ry >= g->g.size() || rx >= g->g[0].size()) continue;
+      if (ry < 0 || rx < 0 || ry >= g->g.size() || rx >= g->g[0].size()) {
+        AREA_WALL[i][j] = 1;
+        continue;
+      }
       AREA_PL[i][j] = 0;
       for (int k = 0; k < g->units.size(); k++) {
         if (g->units[k]->x == rx && g->units[k]->y == ry) {

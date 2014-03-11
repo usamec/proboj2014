@@ -8,7 +8,7 @@ import numpy as np
 from pygame.locals import *
 import os
 
-FPS = 10
+FPS = 100
 WINDOWWIDTH = 1000
 WINDOWHEIGHT = 700
 
@@ -31,8 +31,8 @@ velkost = 0
 stav = "running"
 args = sys.argv[1:]
 mypath = os.path.dirname(os.path.abspath(__file__))
-hracc = pygame.image.load(mypath + '/mravec-7.png')
-hracc = pygame.transform.scale(hracc,(15,20))
+hracc0 = pygame.image.load(mypath + '/japonskoicon.png')
+hracc0 = pygame.transform.scale(hracc0,(10,10))
 marginTop, marginLeft = 20, 20
 counter = 0
 
@@ -167,15 +167,15 @@ def gameUpdate():
         cukor[c['y']][c['x']] = c['new_ammount']
     print "cas:",
     print (counter)
-    print ("dejesa: ")
-    pprint.pprint(dejeSa)
+    #print ("dejesa: ")
+    #pprint.pprint(dejeSa)
     
 
 def iWanaRect(x, y, size):
     global mapa, velkost
     
     iHaveX, iHaveY = 600, 600
-    velkost = (min(iHaveX / mapa['c'] , iHaveY / mapa['r']))
+    velkost = (min(iHaveX / 60 , iHaveY / 60))
     
     return pygame.Rect(marginLeft + x*velkost - size, marginTop + y*velkost - size, velkost + size*2, velkost + size*2)
 
@@ -194,7 +194,7 @@ def drawMap():
             policko = iWanaRect(j,i,0)
             pygame.draw.rect(DISPLAYSURF, getColor(mapa['data'][i][j],cukor[i][j]) , policko)
             if mapa['bases'][i][j]>0 and mapa['bases'][i][j]<6:
-                policko = iWanaRect(j,i,0-1)
+                policko = iWanaRect(j,i,0)
                 pygame.draw.rect(DISPLAYSURF,  getBaseColor(mapa['bases'][i][j]-1) , policko)
             
     pass
@@ -206,19 +206,24 @@ def drawPlayers():
     for i, player in enumerate (dejeSa['units']):
         
         for minion in player:
-            
-            char = iWanaRect(minion['x'],minion['y'],2)
-            pygame.draw.rect(DISPLAYSURF, getPlayerColor(i) , char)
+            char = iWanaRect(1,1,0)
+            if i == 0:    
+                DISPLAYSURF.blit(hracc0, iWanaPoz(minion['x'],minion['y'], 10,10))
+                char = iWanaRect(minion['x'],minion['y'],0)
+ 
+            else:
+                char = iWanaRect(minion['x'],minion['y'],0)
+                pygame.draw.rect(DISPLAYSURF, getPlayerColor(i) , char)
             #DISPLAYSURF.blit(hracc, iWanaPoz(minion['x'],minion['y'], 20,30))
-            
-            
+
             cukerBar = iWanaRect(minion['x'],minion['y'],0)
             cukerBar.height = 3
-            cukerBar.width = minion['carry']*3
+            cukerBar.width = minion['carry']
             cukerBar.center = char.center
-            cukerBar.bottom = char.top+2
+            cukerBar.bottom = char.top+2-4
             
-            pygame.draw.rect(DISPLAYSURF, WHITE , cukerBar)
+            if minion['carry']>0:
+                pygame.draw.rect(DISPLAYSURF, WHITE , cukerBar)
             
     pass
     
@@ -295,17 +300,17 @@ def bright(color,x):
 def getPlayerColor(kto):
     """ vrati farbu hraca"""
     if kto == 1:
-        return ( 160, 84, 47) #slniecko
+        return ( 160, 84, 47) #mexico
     elif kto == 2:
-        return (0, 0, 200) # more
+        return (0, 0, 200) # rusko
     elif kto == 3:
-        return (200, 0, 200)
+        return (200, 0, 200) # taliansko
     elif kto == 4:
         return (255, 128 , 0)
     elif kto == 5:
         return (0, 0, 0)
     elif kto == 0:
-        return (255,100,100)
+        return (255,100,100) # japonsko
     else: return (50,50,50)    
 
 def getBaseColor(kto):

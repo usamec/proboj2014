@@ -2,6 +2,7 @@ import os
 import datetime
 import random
 import sys
+import time
 
 n_players = 4
 cur_scores = [0 for x in xrange(n_players)]
@@ -20,13 +21,16 @@ if not os.system(cmd) == 0:
   print "compile failed"
   sys.exit(1)
 
+print "compile done"
+
 filename = datetime.datetime.now().strftime("../logs/%Y_%m_%d_%H_%M_%S.log")
 
+print os.listdir("../maps/")
 ma = "../maps/" + random.choice(os.listdir("../maps/"))
 
 print ma
 
-cmd2 = "./server %s %s" % (ma, filename)
+cmd2 = "./server %s %s >/dev/null" % (ma, filename)
 
 os.system(cmd2)
 
