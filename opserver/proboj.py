@@ -45,9 +45,9 @@ def main():
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
     BASICFONT = pygame.font.Font('freesansbold.ttf', 18)
     pygame.display.set_caption('Cukor')
-    pygame.display.toggle_fullscreen()
     
     getInput()
+    pygame.display.toggle_fullscreen()
     runGame()
     showStats()
     pass
@@ -56,8 +56,16 @@ def getInput():
     
     global mapa, steps, cukor
     raw = ""
-    raw = raw_input()
+    
+    if len(sys.argv)>1:
+        path = sys.argv[1]
+        if os.path.exists(path):
+            raw = open(path,'r').read()
+        else: print "invalid file"
+    else: raw = raw_input()
+    
     print "WANA BANANA?"
+    
     funnyStruct = json.loads(raw)
     #pprint.pprint(funnyStruct)
     
@@ -165,8 +173,8 @@ def gameUpdate():
         
     for c in dejeSa['zucker']:
         cukor[c['y']][c['x']] = c['new_ammount']
-    print "cas:",
-    print (counter)
+    #print "cas:",
+    #print (counter)
     #print ("dejesa: ")
     #pprint.pprint(dejeSa)
     
