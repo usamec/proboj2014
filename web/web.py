@@ -85,6 +85,18 @@ def get_last_games():
 
   return last_games
 
+def get_all_games():
+  logs = sorted(filter(lambda x: x.endswith('.log'), os.listdir("logs")), reverse=True)
+  logs = [x[:-4] for x in logs]
+  last_games = []
+  for log in logs:
+    f = open("logs/%s.log.scr" % log)
+    scores = {NAMES[i]: int(x) for i,x in enumerate(f)}
+    f.close()
+    last_games.append({"name": log, "scores": scores})
+
+  return last_games
+
 @app.route('/downgame/<game>')
 def downgame(game):
   if os.path.exists("logs/%s.log" % game):
@@ -98,6 +110,11 @@ def main():
   user, name = get_user()
   return render_template('index.html', user=user, name=name, scores=get_scores(),
                          last_games=get_last_games())
+
+@app.route('/all_games')
+def all_games():
+  return render_template('allgames.html', scores=get_scores(),
+                         games=get_all_games())
 
 
 if __name__ == '__main__':

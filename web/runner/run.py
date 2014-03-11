@@ -40,7 +40,7 @@ assert(len(cs) == n_players)
 f.close()
 
 for i in xrange(n_players):
-  cur_scores[i] += cs[i]
+  cur_scores[i] += 2*cs[i]
 
 f = open("../logs/scores.txt", "w")
 for x in cur_scores:
