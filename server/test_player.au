@@ -6,6 +6,7 @@ def min(a, b) {
   return b;
 }
 
+/* komentar */
 c = min(4,7);
 
 d = AREA_PL[c,c];

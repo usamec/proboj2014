@@ -2,6 +2,7 @@ from compiler_objs import *
 %%
 parser Proboj:
     ignore:      '\\s+'
+    ignore:      "/\*[0-9a-zA-z\s]*\*/"
     token NUM:   '-?[0-9]+'
     token ELIF:  "elif"
     token IF:    "if"

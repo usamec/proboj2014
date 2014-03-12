@@ -30,6 +30,7 @@ class ProbojScanner(runtime.Scanner):
         ('"[(]"', re.compile('[(]')),
         ('";"', re.compile(';')),
         ('\\s+', re.compile('\\s+')),
+        ('/\\*[0-9a-zA-z\\s]*\\*/', re.compile('/\\*[0-9a-zA-z\\s]*\\*/')),
         ('NUM', re.compile('-?[0-9]+')),
         ('ELIF', re.compile('elif')),
         ('IF', re.compile('if')),
@@ -45,7 +46,7 @@ class ProbojScanner(runtime.Scanner):
         ('END', re.compile('$')),
     ]
     def __init__(self, str,*args,**kw):
-        runtime.Scanner.__init__(self,None,{'\\s+':None,},str,*args,**kw)
+        runtime.Scanner.__init__(self,None,{'/\\*[0-9a-zA-z\\s]*\\*/':None,'\\s+':None,},str,*args,**kw)
 
 class Proboj(runtime.Parser):
     Context = runtime.Context

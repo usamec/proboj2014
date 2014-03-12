@@ -74,7 +74,10 @@ Game LoadGame(char* fn) {
       g.units.push_back(u);
     }
   }
-
+  int x;
+  if (fscanf(f, "%d", &x)>0) {
+    max_tick = x;
+  }
   return g;
 };
 
