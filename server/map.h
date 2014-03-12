@@ -48,6 +48,13 @@ struct Attack {
       from(f), to(t), success(s) {}
 };
 
+struct Write {
+  pair<int, int> where;
+  int who;
+  Write() {}
+  Write(pair<int, int> wh, int p) : where(wh), who(p) {}
+};
+
 struct Game {
   Grid g;
   int units_per_team;
@@ -55,6 +62,7 @@ struct Game {
   vector<Unit*> units;
   vector<pair<int, pair<int, int>>> cur_msgs;
   vector<Attack> cur_attacks;
+  vector<Write> cur_writes;
 };
 
 

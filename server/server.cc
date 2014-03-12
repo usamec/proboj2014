@@ -217,6 +217,7 @@ void Unit::MOVE(int yy, int xx) {
 void Unit::WRITE(int num) {
   if (act) return;
   act = true;
+  g->cur_writes.push_back(Write(make_pair(y, x), player_id));
   g->g[y][x].marks[player_id-1] = num;
 }
 
@@ -362,6 +363,19 @@ int main(int argc, char** argv) {
     }
     fprintf(flog, "]");
     g.cur_attacks.clear();
+ 
+    fprintf(flog, ", \"writes\": [");
+    for (int i = 0; i < g.cur_writes.size(); i++) {
+      fprintf(flog, "{\"y\": %d, \"x\": %d, \"player_id\": %d}",
+              g.cur_writes[i].where.first, g.cur_writes[i].where.second,
+	      g.cur_writes[i].who);
+      if (i + 1 < g.cur_msgs.size()) {
+        fprintf(flog, ",");
+      }  
+    }
+    fprintf(flog, "]");
+    g.cur_writes.clear();
+
     fprintf(flog, "}%c", st + 1 == n_steps ? ']' : ','); 
   }
   fprintf(flog, "}");
