@@ -89,7 +89,8 @@ def getInput():
     
     velkost = min(600/mapa['r'],600/mapa['c'])
     hracc0 = pygame.transform.scale(hracc0,(velkost-2,velkost-2))       
-    hovienko = pygame.transform.scale(hovienko,(max(5,velkost-5),max(5,velkost-5)))       
+    hovienko = pygame.transform.scale(hovienko,(max(5,velkost/2),max(5,velkost/2)))       
+    #hovienko = hovienko.set_alpha(10)
     #pprint.pprint(mapa)
     #pprint.pprint(environment)
     pass
@@ -213,7 +214,7 @@ def gameUpdate():
         
         
     for p in dejeSa['writes']:
-        pooop[p['y']][p['x']] = 100    
+        pooop[p['y']][p['x']] = 1000    
     for c in dejeSa['zucker']:
         cukor[c['y']][c['x']] = c['new_ammount']
     #print "cas:",
@@ -283,7 +284,7 @@ def drawPlayers():
 
             cukerBar = iWanaRect(minion['x'],minion['y'],0)
             cukerBar.height = 3
-            cukerBar.width = minion['carry']
+            cukerBar.width = float(minion['carry']*velkost)/10
             cukerBar.center = char.center
             cukerBar.bottom = char.top+2-4
             
@@ -312,7 +313,7 @@ def drawFight():
         
         if msg['success']==1:
             #zomri druheho
-            kil = iWanaRect(to['x'],to['y'],(float (0-velkost)/4))
+            kil = iWanaRect(to['x'],to['y'],0-2)
             pygame.draw.rect(DISPLAYSURF, RED, kil)
             """
             fightKill = BASICFONT.render('p: '+ str(msg['from_player']) , True, getPlayerColor(msg['from_player']-1)) 
