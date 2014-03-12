@@ -30,12 +30,13 @@ steps = []
 cukor = []
 state = 0
 dejeSa = []
-velkost = 0
+velkost = 10
 stav = "running"
 args = sys.argv[1:]
 mypath = os.path.dirname(os.path.abspath(__file__))
 hracc0 = pygame.image.load(mypath + '/japonskoicon.png')
-hracc0 = pygame.transform.scale(hracc0,(10,10))
+
+#hracc0 = pygame.transform.scale(hracc0,(velkost,velkost))
 marginTop, marginLeft = 20, 20
 counter = 0
 
@@ -57,8 +58,9 @@ def main():
 
 def getInput():
     
-    global mapa, steps, cukor
+    global mapa, steps, cukor, hracc0, velkost
     raw = ""
+    
     
     if len(sys.argv)>1:
         path = sys.argv[1]
@@ -82,7 +84,8 @@ def getInput():
     steps = funnyStruct['steps']
     cukor = [ [0 for i in range(mapa['c'])] for j in range(mapa['r']) ]
     
-    
+    velkost = min(600/mapa['r'],600/mapa['c'])
+    hracc0 = pygame.transform.scale(hracc0,(velkost-2,velkost-2))       
     #pprint.pprint(mapa)
     #pprint.pprint(environment)
     pass
@@ -175,6 +178,7 @@ def runGame():
     pass
 
 def drawTotalScores():
+  
   mypath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
   if os.path.exists(mypath+"/web/logs/scores.txt"):
     f = open(mypath+"/web/logs/scores.txt")
@@ -190,7 +194,8 @@ def drawTotalScores():
       scoreRect.topright = (WINDOWWIDTH - 20, 400+20*(i+2))
       DISPLAYSURF.blit(scoreSurf, scoreRect)
   else:
-    assert(False)
+    #assert(False)
+    pass
 
 def gameUpdate():
     global mapa, steps, cukor, state, dejeSa, stav
@@ -213,7 +218,7 @@ def iWanaRect(x, y, size):
     global mapa, velkost
     
     iHaveX, iHaveY = 600, 600
-    velkost = (min(iHaveX / 60 , iHaveY / 60))
+    velkost = (min(iHaveX / mapa['r'] , iHaveY / mapa['c']))
     
     return pygame.Rect(marginLeft + x*velkost - size, marginTop + y*velkost - size, velkost + size*2, velkost + size*2)
 
@@ -246,11 +251,12 @@ def drawPlayers():
         for minion in player:
             char = iWanaRect(1,1,0)
             if i == 0:    
-                DISPLAYSURF.blit(hracc0, iWanaPoz(minion['x'],minion['y'], 10,10))
+                
+                DISPLAYSURF.blit(hracc0, iWanaRect(minion['x']-1,minion['y']-1,0).topright)
                 char = iWanaRect(minion['x'],minion['y'],0)
  
             else:
-                char = iWanaRect(minion['x'],minion['y'],0)
+                char = iWanaRect(minion['x'],minion['y'],-2)
                 pygame.draw.rect(DISPLAYSURF, getPlayerColor(i) , char)
             #DISPLAYSURF.blit(hracc, iWanaPoz(minion['x'],minion['y'], 20,30))
 
