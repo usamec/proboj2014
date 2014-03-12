@@ -34,6 +34,12 @@ Logged as {{ name }}.
 <input type="submit" value="Submituj" />
 </form>
 
+Stare uploady:
+{% for file in files %}
+<a href="get_upload/{{file}}">{{file}}</a>
+{% endfor %}
+
+
 {% else %}
 <form action="login" method="post">
 Heslo:<input type="password" name="password" />

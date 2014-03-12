@@ -14,8 +14,9 @@ from local_config import *
 
 def get_user():
   if 'user' in session:
-    return session['user'], NAMES[session['user']]
-  return None, None
+    files = sorted(os.listdir("uploads/%s" % session['user']), reverse=True)
+    return session['user'], NAMES[session['user']], files
+  return None, None, None
 
 @app.route('/logout')
 def logout():
@@ -97,6 +98,14 @@ def get_all_games():
 
   return last_games
 
+@app.route('/get_upload/<file>')
+def get_upload(file):
+  if os.path.exists("uploads/%s/%s" % (session['user'], file)):
+    return send_file("uploads/%s/%s" % (session['user'], file),
+                     as_attachment=True, attachment_filename=file)
+  else:
+    return "ty si chudak!"
+
 @app.route('/downgame/<game>')
 def downgame(game):
   if os.path.exists("logs/%s.log.gz" % game):
@@ -110,9 +119,10 @@ def downgame(game):
 
 @app.route('/')
 def main():
-  user, name = get_user()
+  user, name, files = get_user()
+  print files
   return render_template('index.html', user=user, name=name, scores=get_scores(),
-                         last_games=get_last_games())
+                         last_games=get_last_games(), files=files)
 
 @app.route('/all_games')
 def all_games():
