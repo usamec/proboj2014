@@ -121,5 +121,5 @@ def all_games():
 
 
 if __name__ == '__main__':
-  app.run(debug=True, host='0.0.0.0')
+  app.run(debug=True, host='10.47.42.1')
 
