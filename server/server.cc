@@ -53,7 +53,9 @@ Game LoadGame(char* fn) {
       if (x < 0) {
         g.g[i][j].wall = true;
       } else if (x >= 1) {
-        g.g[i][j].base = base_perm[(int)(x)-1]+1;
+        if (((int)x)-1 < base_perm.size()) {
+          g.g[i][j].base = base_perm[(int)(x)-1]+1;
+        }
       }
       else g.g[i][j].zucker_prob = x;
       g.g[i][j].marks.resize(n_players);

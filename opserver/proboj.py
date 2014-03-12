@@ -8,7 +8,10 @@ import numpy as np
 from pygame.locals import *
 import os
 
-FPS = 100
+names = ["Japonsko", "Mexiko", "Rusko", "Taliansko"]
+FPS = 500
+skipin = 10
+skiped = 0
 WINDOWWIDTH = 1000
 WINDOWHEIGHT = 700
 
@@ -38,7 +41,7 @@ counter = 0
 
 def main():
     global FPSCLOCK, DISPLAYSURF, BASICFONT
-    global mapa, steps, cukor
+    global mapa, steps, cukor, skipin, skiped
     
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
@@ -86,7 +89,7 @@ def getInput():
 
 def runGame():
     global FPSCLOCK, DISPLAYSURF, BASICFONT, FPS, counter
-    global mapa, steps, cukor, stav
+    global mapa, steps, cukor, stav, skipin, skiped, dejeSa, state
     
     
     print "Game is running"
@@ -132,6 +135,10 @@ def runGame():
                         FPS = 1
                 elif event.key == K_w:
                     FPS += 1
+                elif event.key == K_t:
+                    skipin += 1
+                elif event.key == K_y:
+                    skipin = max(0,skipin-1)
                 
                 elif event.key == K_e:
                     FPS -= 10
@@ -140,20 +147,26 @@ def runGame():
                     FPS += 10
                     
                     
-        DISPLAYSURF.fill(BGCOLOR)
         if stav == "running":
             gameUpdate()
         
-        drawMap()
-        drawPlayers()
-        drawMsg()
-        drawFight()
-        drawScore()        
+	if skiped>=skipin or len(steps[state]['attacks'])>0:
+		
+        	DISPLAYSURF.fill(BGCOLOR)
+                skiped=0
+		drawMap()
+		drawPlayers()
+		drawMsg()
+		drawFight()
+		drawScore()
+		drawTotalScores()        
+	        pygame.display.update()
         
+        else: skiped+=1
+
         if wanaHelp :
             drawHelp()
         
-        pygame.display.update()
         
         
         if stav == 'end':
@@ -161,6 +174,23 @@ def runGame():
         FPSCLOCK.tick(FPS)
     pass
 
+def drawTotalScores():
+  mypath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+  if os.path.exists(mypath+"/web/logs/scores.txt"):
+    f = open(mypath+"/web/logs/scores.txt")
+    scores = [x.strip() for x in f]
+    f.close()
+    scoreSurf = BASICFONT.render("Celkove skore:", True, BLACK) #funky options
+    scoreRect = scoreSurf.get_rect()
+    scoreRect.topright = (WINDOWWIDTH - 20, 420)
+    DISPLAYSURF.blit(scoreSurf, scoreRect)   
+    for i,s in enumerate (scores):
+      scoreSurf = BASICFONT.render(names[i]+ ': ' + str(s), True, getPlayerColor(i)) #funky options
+      scoreRect = scoreSurf.get_rect()
+      scoreRect.topright = (WINDOWWIDTH - 20, 400+20*(i+2))
+      DISPLAYSURF.blit(scoreSurf, scoreRect)
+  else:
+    assert(False)
 
 def gameUpdate():
     global mapa, steps, cukor, state, dejeSa, stav
@@ -329,13 +359,12 @@ def getBaseColor(kto):
     return bright(pom,const)
 
 def drawScore():
-    global dejeSa, FPS
+    global dejeSa, FPS, FPSCLOCK
     
-    scoreSurf = BASICFONT.render('FPS: '+ str(FPS)+ '  frame: ' + str(counter), True, BLACK) #funky options
+    scoreSurf = BASICFONT.render('FPS: '+ str(FPS)+" "+("%.1f"%FPSCLOCK.get_fps())+ '  frame: ' + str(counter), True, BLACK) #funky options
     scoreRect = scoreSurf.get_rect()
     scoreRect.topright = (WINDOWWIDTH - 20, 20)
     DISPLAYSURF.blit(scoreSurf, scoreRect)
-    names = ["Japonsko", "Mexiko", "Rusko", "Taliansko"]
         
     for i,s in enumerate (dejeSa['scores']):
         scoreSurf = BASICFONT.render(names[i]+ ': ' + str(dejeSa['scores'][i]), True, getPlayerColor(i)) #funky options

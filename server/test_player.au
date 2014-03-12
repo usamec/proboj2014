@@ -6,6 +6,8 @@ def min(a, b) {
   return b;
 }
 
+c = a/b;
+
 c = min(4,7);
 
 d = AREA_PL[c,c];

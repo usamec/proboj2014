@@ -15,6 +15,7 @@ class Player1 : public Unit {
       return data["b"];
     }};
     min omin;
+    data["c"]=(data["a"]/data["b"]);
     data["c"]=omin(4,7);
     data["d"]=AREA_PL[data["c"]][data["c"]];
     if ((AREA_PL[1][0]>0)) {
