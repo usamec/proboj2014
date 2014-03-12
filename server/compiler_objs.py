@@ -175,11 +175,11 @@ class Exprf:
   def output(self):
     global functions
     if not isinstance(self.expr, Id):
-      print >>sys.stderr, "zle volanie funkcie"
+      print >>sys.stderr, "zle volanie funkcie, volas funkciu na nieco divne"
       sys.exit(1)
     name = self.expr.what
     if name not in functions:
-      print >>sys.stderr, "zle volanie funkcie"
+      print >>sys.stderr, "zle volanie funkcie, neznama func", name
       sys.exit(1)
 
     ret_parts = []

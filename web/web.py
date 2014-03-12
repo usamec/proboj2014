@@ -36,7 +36,7 @@ def login():
 
 @app.route('/upload', methods=['POST'])
 def upload():
-  user, name = get_user()
+  user, name, files = get_user()
   if user == None:
     return redirect(url_for('main'))
 
