@@ -74,8 +74,8 @@ def get_scores():
   return scores
 
 def get_last_games():
-  logs = sorted(filter(lambda x: x.endswith('.log'), os.listdir("logs")), reverse=True)[:3]
-  logs = [x[:-4] for x in logs]
+  logs = sorted(filter(lambda x: x.endswith('.log') or x.endswith('.log.gz'), os.listdir("logs")), reverse=True)[:3]
+  logs = [x[:-4] if x.endswith('.log') else x[:-7] for x in logs]
   last_games = []
   for log in logs:
     f = open("logs/%s.log.scr" % log)
@@ -86,8 +86,8 @@ def get_last_games():
   return last_games
 
 def get_all_games():
-  logs = sorted(filter(lambda x: x.endswith('.log'), os.listdir("logs")), reverse=True)
-  logs = [x[:-4] for x in logs]
+  logs = sorted(filter(lambda x: x.endswith('.log') or x.endswith('.log.gz'), os.listdir("logs")), reverse=True)
+  logs = [x[:-4] if x.endswith('.log') else x[:-7] for x in logs]
   last_games = []
   for log in logs:
     f = open("logs/%s.log.scr" % log)
@@ -99,6 +99,9 @@ def get_all_games():
 
 @app.route('/downgame/<game>')
 def downgame(game):
+  if os.path.exists("logs/%s.log.gz" % game):
+    return send_file("logs/%s.log.gz" % game, as_attachment=True,
+                     attachment_filename="%s.log.gz" % game) 
   if os.path.exists("logs/%s.log" % game):
     return send_file("logs/%s.log" % game, as_attachment=True,
                      attachment_filename="%s.log" % game) 

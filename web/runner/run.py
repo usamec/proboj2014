@@ -47,3 +47,5 @@ for x in cur_scores:
   print >>f, x
 
 f.close()
+
+os.system("gzip %s" % filename)
