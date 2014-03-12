@@ -1,0 +1,92 @@
+
+
+    Logout ok
+
+Stiahni server
+Heslo:
+Aktuálny stav
+Mexiko: 50913
+Rusko: 253818
+Taliansko: 206269
+Japonsko: 103668
+Posledné hry
+2014_03_12_14_58_54 Mexiko: 0; Rusko: 0; Taliansko: 730; Japonsko: 0;
+2014_03_12_14_56_13 Mexiko: 10; Rusko: 10; Taliansko: 260; Japonsko: 0;
+2014_03_12_14_53_28 Mexiko: 53; Rusko: 230; Taliansko: 776; Japonsko: 122;
+Vsetky hry
+Manuál
+
+Server si po stiahnutí skompilujete nasledovne:
+
+python2 compile_game.py all test_player.au iny_player.au
+./server test_map.m test.log
+
+Server vyrobí súbor test.log a ten podhodíte observeru.
+
+Pokiaľ chcete robiť debug výstupy počas behu vášho hráča, tak najprv pustite
+
+python2 compile_game.py precompile test_player.au iny_player.au
+
+A následne upravte playerX.h a pustite:
+
+python2 compile_game.py compile
+
+Jazyk AU
+Jazyk je veľmi podobný osekanému C. Neexistujú tam deklarácie, všetko sú len celé čísla (int) a pokiaľ niečo neinicializované použijete bude tam hodnota 0. Medzi ťahmi vám obsah premenných ostáva. Z aritmetických operácii fungujú: +, -, *, /, %, <, <=, ==, > >, &&, ||, != Pokiaľ budete potrebovat bitwise magiu, tak sa ozvite, dorobíme. Takisto neexistujú cykly, iba podmienky. Tie navyše môžu byt iba tvaru :
+
+if (...) {
+} elif (...) {
+} else {
+}
+
+Časti elif môže byť aj viac. Else je nepovinný. Ale else if neexistuje. A brčkaté zátvorky sú povinné. Existuje niekoľko špeciálnych premenných, ktoré sa na začiatku ťahu naplnia (vy si ich môžete prepísať čím chcete, ale neodporúča sa):
+
+    PL_ID - id vášho hráča (čísluje sa od 1)
+    ID - id panáka (čísluje sa od 1)
+    Y, X - súradnice, číslované od 0
+    R, C - rozmery mapy
+    CARRY - váš aktuálny náklad, maximálna nosnosť je 10
+    MAX_ID - maximalne ID vasho panaka
+    MAX_PLAYER - maximalne ID hraca
+    TICK - cislo aktualneho kroku, cislujeme od 1
+    MAX_TICK - celkovy pocet krokov (cely cas konstanta)
+
+Pokiaľ chcete náhodné číslo použite token RAND, napr.:
+
+abc = RAND % 17;
+
+Ďalej máte nejake informácie o stave mapy okolo seba (do manhatanovskej vzdialenosti 2):
+
+    AREA_PL[y,x] - kto sa nachádza na pozícii (Y+y,X+x): 0 - nič, +x panák hráča s číslom x, -x váš panák s číslom -x
+    AREA_BASE[y,x] - koho základňa sa nachádza na pozícii (Y+y,X+x)
+    AREA_WALL[y,x] - 1 ak sa na pozícii (Y+y,X+x) nachádza prekážka
+    AREA_ZUCK[y,x] - množstvo cukru na pozícii (Y+y,X+x)
+    AREA_MARKS[y,x] - vaša značka na pozícii (Y+y,X+x)
+
+Počas ťahu môžete urobiť jednu z nasledujúcich akcíí:
+
+    MOVE(y,x) - pohyb, v každej súradnici max o 1
+    GRAB() - zober jeden cukor odtiaľ kde stojíš
+    PUT() - pokiaľ si vo svojej základni polož cukor
+    WRITE(w) - zapiš na svoju pozíciu číslo w
+    ATTACK(y,x) - zaútoč na pozíciu (Y+y, X+x), šanca na zabitie je 1/3, zabitá jednotka príde o všetko, zresetuje sa a skončí v báze
+
+Navyše počas ťahu môžete posielať správy iným hráčom. Správa posiela veľmi jednoducho:
+
+MSG(komu, 1, 2, 3);
+
+Správa môže obsahovať ľubovoľne veľa čísel. Panáci správy aj prijímajú. Pokiaľ niekomu medzi ťahmi príde viac ako jedna správa, tak dostane len poslednú: V mieste INBOX[0] je dĺžka prijatej správy. V INBOX[i] je i-te číslo zo správy. Pokiaľ siahnete mimo rozsahu správy dostanete nulu. Testovacia mapa zatiaľ podporuje iba dvoch hračov, ktorý majú dvoch panákov. Ale existuje test_map2.m, ktorá je trochu väčšia. Funkcie: Vid test_player.au. Definicia funkcie:
+
+def fff(a, b, c) {
+  return b + c;
+}
+
+Vo vnutri funkcie nevidite globalne premenne (vidite len argumenty a premenne, ktore vytvori funkcia). Funkcia sa vola klasicky:
+
+xx = fff(2, 3, 4);
+
+Pokiaľ si chcete pozrieť hru tak vhodný príkaz je:
+
+python2 opserver/proboj.py <test.log
+
+
