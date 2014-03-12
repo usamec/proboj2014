@@ -28,6 +28,7 @@ BGCOLOR = WHITE
 mapa = []
 steps = []
 cukor = []
+pooop = []
 state = 0
 dejeSa = []
 velkost = 10
@@ -35,6 +36,7 @@ stav = "running"
 args = sys.argv[1:]
 mypath = os.path.dirname(os.path.abspath(__file__))
 hracc0 = pygame.image.load(mypath + '/japonskoicon.png')
+hovienko = pygame.image.load(mypath + '/poooooop.gif')
 
 #hracc0 = pygame.transform.scale(hracc0,(velkost,velkost))
 marginTop, marginLeft = 20, 20
@@ -58,7 +60,7 @@ def main():
 
 def getInput():
     
-    global mapa, steps, cukor, hracc0, velkost
+    global mapa, steps, cukor, hracc0, velkost, hovienko, pooop
     raw = ""
     
     
@@ -83,9 +85,11 @@ def getInput():
     
     steps = funnyStruct['steps']
     cukor = [ [0 for i in range(mapa['c'])] for j in range(mapa['r']) ]
+    pooop = [ [0 for i in range(mapa['c'])] for j in range(mapa['r']) ]
     
     velkost = min(600/mapa['r'],600/mapa['c'])
     hracc0 = pygame.transform.scale(hracc0,(velkost-2,velkost-2))       
+    hovienko = pygame.transform.scale(hovienko,(max(5,velkost-5),max(5,velkost-5)))       
     #pprint.pprint(mapa)
     #pprint.pprint(environment)
     pass
@@ -158,6 +162,7 @@ def runGame():
         	DISPLAYSURF.fill(BGCOLOR)
                 skiped=0
 		drawMap()
+		drawPoop()
 		drawPlayers()
 		drawMsg()
 		drawFight()
@@ -206,6 +211,9 @@ def gameUpdate():
         stav= "end"
         return
         
+        
+    for p in dejeSa['writes']:
+        pooop[p['y']][p['x']] = 100    
     for c in dejeSa['zucker']:
         cukor[c['y']][c['x']] = c['new_ammount']
     #print "cas:",
@@ -226,6 +234,19 @@ def iWanaPoz(x,y,sizex,sizey):
     """vrati pixelovu poziciu hraca na gride"""
     
     return (marginLeft + x*velkost - sizex/2 + velkost/2, marginTop + y*velkost - sizey/2 + velkost/2)
+    pass
+
+def drawPoop():
+    
+    global mapa, steps, cukor, velkost
+        
+    for i in range(mapa['r']):
+        for j in range(mapa['c']):
+            if pooop[i][j]==0:
+                continue
+            pooop[i][j]-=1
+            DISPLAYSURF.blit(hovienko, iWanaRect(j-1,i,0).topright)
+                
     pass
 
 
@@ -252,7 +273,7 @@ def drawPlayers():
             char = iWanaRect(1,1,0)
             if i == 0:    
                 
-                DISPLAYSURF.blit(hracc0, iWanaRect(minion['x']-1,minion['y']-1,0).topright)
+                DISPLAYSURF.blit(hracc0, iWanaRect(minion['x']-1,minion['y'],0).topright)
                 char = iWanaRect(minion['x'],minion['y'],0)
  
             else:
